@@ -16,9 +16,8 @@ public class SimpleWorker implements Runnable {
     }
 
     // Implements Runnable interface
-    public function run(...args):void {
-        const values:* = args[0];
-        dispatcher.dispatchResult(add(values[0], values[1]));
+    public function run(args:Array):void {
+        dispatcher.dispatchResult(add(args[0], args[1]));
     }
 }
 }

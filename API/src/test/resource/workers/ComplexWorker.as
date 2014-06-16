@@ -17,9 +17,9 @@ public class ComplexWorker implements Runnable {
     }
 
     // Implements Runnable interface
-    public function run(...args):void {
-        const values:* = args[0];
-        dispatcher.dispatchResult(add(values[0] as TermsVo));
+    public function run(args:Array):void {
+        const values:TermsVo = args[0] as TermsVo;
+        dispatcher.dispatchResult(add(values));
     }
 }
 }

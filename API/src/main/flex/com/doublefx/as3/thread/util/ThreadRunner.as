@@ -75,14 +75,14 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
         }
     }
 
-    protected function run(...args):void {
+    protected function run(args:Array):void {
 
         if (_runnable) {
             const hasDispatcherProperty:Boolean = DISPATCHER_PROPERTY in _runnable;
             if (hasDispatcherProperty && _runnable[DISPATCHER_PROPERTY] == null) {
                 _runnable[DISPATCHER_PROPERTY] = this;
             }
-            _runnable.run(args[args.length-1]);
+            _runnable.run(args);
         } else
             throw new TypeError(_runnable + " must implement Runnable");
     }

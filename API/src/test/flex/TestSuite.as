@@ -13,6 +13,5 @@ public class TestSuite {
     public var testThreadWithNoRunnable:ThreadTestBase;
     public var simpleTestThread:SimpleThreadTest;
     public var complexTestThread:ComplexThreadTest;
-
 }
 }

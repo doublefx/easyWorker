@@ -159,7 +159,7 @@ public final class Thread extends EventDispatcher implements IThread {
     public function start(...args):void {
         if (_worker) {
             callLater(function ():void {
-                command(_runnableClassName, ThreadRunner.RUN_METHOD, onResult, onProgress, onError, args);
+                command(_runnableClassName, ThreadRunner.RUN_METHOD, args);
             });
             _worker.start();
         }

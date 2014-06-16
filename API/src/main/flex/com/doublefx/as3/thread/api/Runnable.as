@@ -5,6 +5,6 @@ package com.doublefx.as3.thread.api {
 import flash.events.IEventDispatcher;
 
 public interface Runnable{
-    function run(...args):void;
+    function run(args:Array):void;
 }
 }
