@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+  Created by Frederic THOMAS on 14/06/2014.
+-->
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               applicationComplete="applicationCompleteHandler(event)">
+    <fx:Script><![CDATA[
+        import com.doublefx.as3.thread.Thread;
+        import com.doublefx.as3.thread.api.IThread;
+        import com.doublefx.as3.thread.event.ThreadFaultEvent;
+        import com.doublefx.as3.thread.event.ThreadProgressEvent;
+        import com.doublefx.as3.thread.event.ThreadResultEvent;
+
+        import mx.events.FlexEvent;
+
+        import workers.ComplexWorker;
+        import workers.vo.TermsVo;
+
+        private var _thread:IThread;
+
+        private function applicationCompleteHandler(event:FlexEvent):void {
+            _thread = new Thread(ComplexWorker, "complexRunnable");
+            _thread.addEventListener(Event.WORKER_STATE, onWorkerState);
+            _thread.addEventListener(ThreadProgressEvent.PROGRESS, thread_progressHandler);
+            _thread.addEventListener(ThreadResultEvent.RESULT, thread_resultHandler);
+            _thread.addEventListener(ThreadFaultEvent.FAULT, thread_faultHandler);
+            _thread.start(new TermsVo(1, 2));
+        }
+
+        private function onWorkerState(event:Event):void {
+            var state:String = _thread.state;
+        }
+
+        private function thread_resultHandler(event:ThreadResultEvent):void {
+            result.text = event.result;
+        }
+
+        private function thread_faultHandler(event:ThreadFaultEvent):void {
+            result.text = event.fault.message;
+        }
+
+        private function thread_progressHandler(event:ThreadProgressEvent):void {
+        }
+        ]]></fx:Script>
+    <s:Label id="result"/>
+</s:Application>
