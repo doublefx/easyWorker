@@ -142,11 +142,13 @@ This project is compatible with Apache Flex SDK 4.13 which has not been released
 
 Why this minimum requirement ? Because from this version, debugging Workers is possible using FDB or any IDE which use it such as IntelliJ, because Flash Player 11.5 is the first version that allows you to use Worker, Condition and Mutex.
 
-Also, I use the very well done as3-commons-reflect and as3swf libs to reflect and emit the Worker and its dependencies in memory, FlexUnit 4.1 for the tests.
-Those libs can be found [here] [3]
+Also, I use the very well done [as3-commons-reflect] [5] and [as3swf] [3] libs to reflect and emit the Worker and its dependencies in memory, FlexUnit 4.1 for the tests.
+Those libs can be found [here] [4]
 
 [1]:https://github.com/doublefx/easyWorker/issues
 [2]:http://flex.apache.org/installer.html
-[3]:https://drive.google.com/folderview?id=0B0SnI9jZINzGS1M0MUVwMEM5bHM&usp=sharing
+[3]:https://github.com/claus/as3swf
+[4]:https://drive.google.com/folderview?id=0B0SnI9jZINzGS1M0MUVwMEM5bHM&usp=sharing
+[5]:http://www.as3commons.org/as3-commons-reflect/introduction.html
 
 Enjoy and don't hesitate to give me your feedback.
