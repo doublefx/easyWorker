@@ -6,6 +6,9 @@ Flex / Air library to easily implement Workers.
 No more burden to create an other project and / or an extra SWF for your Worker,
 everything is in-memory, don't deal anymore with MessageChannel and other low level classes, use Thread an Events.
 
+Includes all the used classes and nothing more (except if you want to),
+register for you your typed object to pass them back and forth the Worker.
+
 How to use it ?
 ----
 
