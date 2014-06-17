@@ -129,7 +129,7 @@ Note: This is an early stage version, many things have to come:
 
 - Pause and Resume are not implemented yet.
 - Terminate has still a basic implementation.
-- More to come to listen and manipulate your Runnable from the Thread.
+- More to come to interact with your Runnable from the Thread.
 
 The [Issues] [1] is a good place to ask things and raise issues indeed.
 
