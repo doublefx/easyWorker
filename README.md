@@ -12,7 +12,7 @@ register for you your typed object to pass them back and forth the Worker.
 How to use it ?
 ----
 
-You first extend a Runnable:
+You first implement a Runnable:
 
 ```ActionScript
 package workers {
@@ -20,7 +20,7 @@ import com.doublefx.as3.thread.api.CrossThreadDispatcher;
 import com.doublefx.as3.thread.api.Runnable;
 import workers.vo.TermsVo;
 
-// Don't need to implement Sprite anymore.
+// Don't need to extend Sprite anymore.
 public class ComplexWorker implements Runnable {
 
     /**
