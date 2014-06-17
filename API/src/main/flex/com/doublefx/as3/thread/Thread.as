@@ -150,9 +150,9 @@ public final class Thread extends EventDispatcher implements IThread {
     // IThread Implementation //
     ////////////////////////////
 
-    public function command(runnableCassName:String, runnableMethod:String, ...args):void {
+    public function command(runnableClassName:String, runnableMethod:String, ...args):void {
         args.unshift(runnableMethod);
-        args.unshift(runnableCassName);
+        args.unshift(runnableClassName);
         _outgoingChannel.send(args);
     }
 

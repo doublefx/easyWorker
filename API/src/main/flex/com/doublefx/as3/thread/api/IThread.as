@@ -15,11 +15,11 @@ public interface IThread extends IEventDispatcher{
      * Call a particular function on the Runnable.
      * Should disappear, it is preferable to use Interfaces and Proxies instead.
      *
-     * @param runnableCassName The Runnable class name.
+     * @param runnableClassName The Runnable class name.
      * @param runnableMethod The method to call on the Runnable.
      * @param args The arguments to pass to the workerMethod.
      */
-    function command(runnableCassName:String, runnableMethod:String, ...args):void;
+    function command(runnableClassName:String, runnableMethod:String, ...args):void;
 
     /**
      * Start a Thread and call the Runnable's run method.
