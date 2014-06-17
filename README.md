@@ -138,11 +138,11 @@ How to build it:
 
 This project has a Maven structure but is not mavenized yet as the Apache Flex SDK is not at the moment, so, to build it, you will need to create a project based on those sources in your favorite IDE (I use IntelliJ).
 
-This project is compatible with Apache Flex SDK 4.13 which has not been released at the moment I'm writting, I use a nightly built version "Apache Flex 4.13.0 FP 11.5 AIR 3.5". (use the [Apache Flex Intaller 3.1] [2] -will be released in few days- to get it)
+This project is compatible with Apache Flex SDK 4.13 which has not been released at the moment I'm writing, I use a nightly built version "Apache Flex 4.13.0 FP 11.5 AIR 3.5". (use the [Apache Flex Intaller 3.1] [2] -will be released in few days- to get it)
 
 Why this minimum requirement ? Because from this version, debugging Workers is possible using FDB or any IDE which use it such as IntelliJ, because Flash Player 11.5 is the first version that allows you to use Worker, Condition and Mutex.
 
-Also, I use the very well done as3-commons-bytecode and as3swf libs to reflect and emit the Worker and its dependencies in memory, FlexUnit 4.1 and Hamcrest-as3 for the tests.
+Also, I use the very well done as3-commons-reflect and as3swf libs to reflect and emit the Worker and its dependencies in memory, FlexUnit 4.1 and Hamcrest-as3 for the tests.
 Those libs can be found [here] [3]
 
 [1]:https://github.com/doublefx/easyWorker/issues

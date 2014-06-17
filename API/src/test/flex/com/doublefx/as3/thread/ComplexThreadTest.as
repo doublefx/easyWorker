@@ -39,12 +39,12 @@ public class ComplexThreadTest extends SimpleThreadTest {
     override public function testDependenciesContent():void {
         const dependencies:Array = ["mx.core.DebuggableWorker",
             "com.doublefx.as3.thread.api.CrossThreadDispatcher",
-            "com.doublefx.as3.thread.api.Runnable",
             "com.doublefx.as3.thread.util.ClassAlias",
             "com.doublefx.as3.thread.event.ThreadFaultEvent",
             "com.doublefx.as3.thread.event.ThreadResultEvent",
             "com.doublefx.as3.thread.event.ThreadProgressEvent",
             "workers.ComplexWorker",
+            "com.doublefx.as3.thread.api.Runnable",
             "workers.vo.TermsVo"];
 
         assertThat(Thread(_thread).dependencies.toArray(), arrayExact(dependencies));
@@ -52,7 +52,7 @@ public class ComplexThreadTest extends SimpleThreadTest {
 
     [Test(description="Verify the Runnable class name")]
     override public function testRunnableClassName():void {
-        assertEquals(Thread(_thread).runnableClassName, "workers::ComplexWorker");
+        assertEquals(Thread(_thread).runnableClassName, "workers.ComplexWorker");
     }
 
     [Test(async, description="Verify the Runnable 'run' method can be call with valide complex values")]

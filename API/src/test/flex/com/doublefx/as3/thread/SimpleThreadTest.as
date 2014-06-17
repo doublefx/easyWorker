@@ -45,19 +45,19 @@ public class SimpleThreadTest extends ThreadTestBase {
     public function testDependenciesContent():void {
         const dependencies:Array = ["mx.core.DebuggableWorker",
             "com.doublefx.as3.thread.api.CrossThreadDispatcher",
-            "com.doublefx.as3.thread.api.Runnable",
             "com.doublefx.as3.thread.util.ClassAlias",
             "com.doublefx.as3.thread.event.ThreadFaultEvent",
             "com.doublefx.as3.thread.event.ThreadResultEvent",
             "com.doublefx.as3.thread.event.ThreadProgressEvent",
-            "workers.SimpleWorker"];
+            "workers.SimpleWorker",
+            "com.doublefx.as3.thread.api.Runnable"];
 
         assertThat(Thread(_thread).dependencies.toArray(), arrayExact(dependencies));
     }
 
     [Test(description="Verify the Runnable class name")]
     override public function testRunnableClassName():void {
-        assertEquals(Thread(_thread).runnableClassName, "workers::SimpleWorker");
+        assertEquals(Thread(_thread).runnableClassName, "workers.SimpleWorker");
     }
 
     [Test(description="Verify the Worker has been created")]

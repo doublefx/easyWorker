@@ -2,25 +2,66 @@
  * User: Frederic THOMAS Date: 15/06/2014 Time: 14:48
  */
 package com.doublefx.as3.thread.util {
+import flash.utils.Dictionary;
+
 import mx.collections.ArrayList;
 
-import org.as3commons.bytecode.reflect.ByteCodeMethod;
-import org.as3commons.bytecode.reflect.ByteCodeParameter;
-import org.as3commons.bytecode.reflect.ByteCodeType;
+import org.as3commons.lang.ClassUtils;
+
 import org.as3commons.lang.StringUtils;
-import org.as3commons.reflect.Accessor;
-import org.as3commons.reflect.Constant;
-import org.as3commons.reflect.Field;
+import org.as3commons.reflect.Constructor;
+import org.as3commons.reflect.IMember;
 import org.as3commons.reflect.Method;
+import org.as3commons.reflect.Parameter;
 import org.as3commons.reflect.Type;
-import org.as3commons.reflect.Variable;
 import org.as3commons.reflect.as3commons_reflect;
 
 use namespace as3commons_reflect;
 
 public class ThreadDependencyHelper {
 
-    public static function collectDependencies(codeType:ByteCodeType, returnArray:ArrayList = null):ArrayList {
+    // START: Copied from org.as3commons.bytecode.reflect.ByteCodeType
+    private static const FLASH_NATIVE_PACKAGE_PREFIX:String = 'flash.';
+    private static const nativeClassNames:Dictionary = new Dictionary();
+
+    {
+        nativeClassNames['*'] = true;
+        nativeClassNames['void'] = true;
+        nativeClassNames['Boolean'] = true;
+        nativeClassNames['int'] = true;
+        nativeClassNames['uint'] = true;
+        nativeClassNames['Number'] = true;
+        nativeClassNames['String'] = true;
+        nativeClassNames['Object'] = true;
+        nativeClassNames['Function'] = true;
+        nativeClassNames['RegExp'] = true;
+        nativeClassNames['Array'] = true;
+        nativeClassNames['Error'] = true;
+        nativeClassNames['DefinitionError'] = true;
+        nativeClassNames['EvalError'] = true;
+        nativeClassNames['RangeError'] = true;
+        nativeClassNames['ReferenceError'] = true;
+        nativeClassNames['SecurityError'] = true;
+        nativeClassNames['SyntaxError'] = true;
+        nativeClassNames['TypeError'] = true;
+        nativeClassNames['URIError'] = true;
+        nativeClassNames['VerifyError'] = true;
+        nativeClassNames['UninitializedError'] = true;
+        nativeClassNames['ArgumentError'] = true;
+    }
+
+    private static function isNativeName(name:String):Boolean {
+        return (
+                (StringUtils.startsWith(name, FLASH_NATIVE_PACKAGE_PREFIX)) || //
+                (nativeClassNames[name] == true) || //
+                (StringUtils.startsWith(name, '__AS3__.')) //
+                );
+    }
+
+    // END: Copied from org.as3commons.bytecode.reflect.ByteCodeType
+
+
+    public static function collectDependencies(codeType:Type, returnArray:ArrayList = null):ArrayList {
         if (!returnArray)
             returnArray = new ArrayList();
 
@@ -28,12 +69,12 @@ public class ThreadDependencyHelper {
 
             var fullName:String = codeType.fullName;
 
-            if (addUniquely(fullName, returnArray)) {
+            if (addUniquely(ClassUtils.convertFullyQualifiedName(fullName), returnArray)) {
                 var extendsClasses:Array = codeType.extendsClasses;
                 if (extendsClasses.length > 0) {
                     for each (var extendsClass:String in extendsClasses) {
                         if (isValidTypeName(extendsClass)) {
-                            collectDependencies(ByteCodeType.forName(extendsClass, codeType.applicationDomain), returnArray);
+                            collectDependencies(Type.forName(extendsClass, codeType.applicationDomain), returnArray);
                         }
                     }
                 }
@@ -42,98 +83,54 @@ public class ThreadDependencyHelper {
                 if (interfaces.length > 0) {
                     for each (var interfaceName:String in interfaces) {
                         if (isValidTypeName(interfaceName)) {
-                            collectDependencies(ByteCodeType.forName(interfaceName, codeType.applicationDomain), returnArray);
+                            collectDependencies(Type.forName(interfaceName, codeType.applicationDomain), returnArray);
                         }
                     }
                 }
 
-                var instanceConstructor:ByteCodeMethod = codeType.instanceConstructor;
-                var parameters:Array = instanceConstructor.parameters;
-                var parameter:ByteCodeParameter;
+                var constructor:Constructor = codeType.constructor;
+                var parameters:Array;
+                var parameter:Parameter;
                 var parameterType:Type;
+                var member:IMember;
 
-                if (parameters.length > 0) {
-                    for each (parameter in parameters) {
-                        try {
+                if (constructor) {
+                    parameters = constructor.parameters;
+                    if (parameters.length > 0) {
+                        for each (parameter in parameters) {
                             parameterType = parameter.type;
-                        } catch (e:Error) {
-                            continue;
-                        }
-                        if (parameterType && isValidTypeName(parameterType.fullName)) {
-                            collectDependencies(ByteCodeType.forName(parameterType.fullName, parameterType.applicationDomain), returnArray);
+                            if (parameterType && isValidTypeName(parameterType.fullName)) {
+                                collectDependencies(Type.forName(parameterType.fullName, parameterType.applicationDomain), returnArray);
+                            }
                         }
                     }
                 }
-                for each (var accessor:Accessor in codeType.accessors) {
-                    var accessorType:Type;
-                    try {
-                        accessorType = accessor.type;
-                    } catch (e:Error) {
-                        continue;
-                    }
-                    if (accessorType && isValidTypeName(accessorType.fullName)) {
-                        collectDependencies(ByteCodeType.forName(accessorType.fullName, accessorType.applicationDomain), returnArray);
-                    }
-                }
-                for each (var variable:Variable in codeType.variables) {
-                    var variableType:Type;
-                    try {
-                        variableType = variable.type;
-                    } catch (e:Error) {
-                        continue;
-                    }
-                    if (variableType && isValidTypeName(variableType.fullName)) {
-                        try {
-                            collectDependencies(ByteCodeType.forName(variableType.fullName, variableType.applicationDomain), returnArray);
-                        } catch (e:Error) {
 
-                        }
+                const codeTypes:Array = [codeType.accessors,
+                    codeType.variables,
+                    codeType.staticVariables,
+                    codeType.constants,
+                    codeType.staticConstants,
+                    codeType.fields];
+
+                for each (var members:Array in codeTypes) {
+                    for each (member in members) {
+                        collectMembers(member, returnArray);
                     }
                 }
-                for each (var constant:Constant in codeType.constants) {
-                    var constantType:Type;
-                    try {
-                        constantType = constant.type;
-                    } catch (e:Error) {
-                        continue;
-                    }
-                    if (constantType && isValidTypeName(constantType.fullName)) {
-                        collectDependencies(ByteCodeType.forName(constantType.fullName, constantType.applicationDomain), returnArray);
-                    }
-                }
-                for each (var field:Field in codeType.fields) {
-                    var fieldType:Type;
-                    try {
-                        fieldType = field.type;
-                    } catch (e:Error) {
-                        continue;
-                    }
-                    if (fieldType && isValidTypeName(fieldType.fullName)) {
-                        collectDependencies(ByteCodeType.forName(fieldType.fullName, fieldType.applicationDomain), returnArray);
-                    }
-                }
+
                 for each (var method:Method in codeType.methods) {
-                    var returnTypeName:String = method.returnTypeName;
+                    const returnTypeName:String = method.returnTypeName;
                     if (isValidTypeName(returnTypeName)) {
-                        var returnType:Type;
-                        try {
-                            returnType = method.returnType;
-                        } catch (e:Error) {
-                            continue;
-                        }
-                        collectDependencies(ByteCodeType.forName(returnType.fullName, returnType.applicationDomain), returnArray);
+                        const returnType:Type = method.returnType;
+                        collectDependencies(Type.forName(returnType.fullName, returnType.applicationDomain), returnArray);
                     }
                     parameters = method.parameters;
                     if (parameters.length > 0) {
                         for each (parameter in parameters) {
-                            try {
-                                var typeName:String = parameter.typeName;
-                                parameterType = isValidTypeName(typeName) ? parameter.type : null;
-                            } catch (e:Error) {
-                                continue;
-                            }
-                            if (parameterType) {
-                                collectDependencies(ByteCodeType.forName(parameterType.fullName, parameterType.applicationDomain), returnArray);
+                            parameterType = parameter.type;
+                            if (isValidTypeName(parameterType.fullName)) {
+                                collectDependencies(Type.forName(parameterType.fullName, parameterType.applicationDomain), returnArray);
                             }
                         }
                     }
@@ -143,11 +140,18 @@ public class ThreadDependencyHelper {
         return returnArray;
     }
 
+    private static function collectMembers(member:IMember, returnArray:ArrayList):void {
+        const memberType:Type = member.type;
+        if (memberType && isValidTypeName(memberType.fullName)) {
+            collectDependencies(Type.forName(memberType.fullName, memberType.applicationDomain), returnArray);
+        }
+    }
+
     public static function isValidTypeName(typeName:String):Boolean {
         if (StringUtils.isEmpty(typeName))
             return false;
 
-        return (typeName != "*" && !ByteCodeType.isNativeName(typeName));
+        return (!isNativeName(typeName));
     }
 
     public static function addUniquely(item:Object, array:ArrayList):Boolean {
@@ -157,5 +161,6 @@ public class ThreadDependencyHelper {
         }
         return false;
     }
+
 }
 }
