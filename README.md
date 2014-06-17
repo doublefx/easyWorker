@@ -20,7 +20,7 @@ import com.doublefx.as3.thread.api.CrossThreadDispatcher;
 import com.doublefx.as3.thread.api.Runnable;
 import workers.vo.TermsVo;
 
-// Don't need to extend Sprite anymore.
+// Don't need to implement Sprite anymore.
 public class ComplexWorker implements Runnable {
 
     /**
