@@ -26,7 +26,7 @@ public class ComplexWorker implements Runnable {
     /**
      * Implements Runnable interface.
      *
-     * @Param args The elements of the args Array contains the
+     * @Param args The elements of the args Array contain the
      * values as you pass them to the Thread.
      */
     public function run(args:Array):void {
@@ -41,7 +41,7 @@ public class ComplexWorker implements Runnable {
 
     /**
      * The task your worker is going to do, note that the library
-     * allows you to have complex workers which depends of other Classes
+     * allows you to have complex workers which depend of other Classes
      * and you don't need anymore to register the Class aliases,
      * most of the time, it will be detected and managed for you.
      */
@@ -52,7 +52,7 @@ public class ComplexWorker implements Runnable {
 }
 ```
 
-Now, to use your Runnable inside the Thread.
+Now, to use your Runnable inside a Thread.
 
 ```ActionScript
         private var _thread:IThread;
@@ -70,7 +70,7 @@ Now, to use your Runnable inside the Thread.
 
 The Constructor of the Thread allows you to pass extra dependencies in case they are not
 automatically detected, those dependencies will be added to you worker and registered as aliases
-allowing you to pass them back and forth the Thread, example:
+allowing you to pass them back and forth the Thread:
 
 ```ActionScript
 const extraDependencies:Vector.<ClassAlias> = new Vector.<ClassAlias>();
@@ -83,17 +83,7 @@ The IThread interface looks like that:
 
  ```ActionScript
  public interface IThread extends IEventDispatcher{
-
-     /**
-      * Call a particular function on the Runnable.
-      * Should disappear, it is preferable to use Interfaces and Proxies instead.
-      *
-      * @param runnableCassName The Runnable class name.
-      * @param runnableMethod The method to call on the Runnable.
-      * @param args The arguments to pass to the workerMethod.
-      */
-     function command(runnableCassName:String, runnableMethod:String, ...args):void;
-
+ 
      /**
       * Start a Thread and call the Runnable's run method.
       *
@@ -138,7 +128,7 @@ The IThread interface looks like that:
 Note: This is an early stage version, many things have to come:
 
 - Pause and Resume are not implemented yet.
-- Terminate has still basic implementation.
+- Terminate has still a basic implementation.
 - More to come to listen and manipulate your Runnable from the Thread.
 
 The [Issues] [1] is a good place to ask things and raise issues indeed.
@@ -148,7 +138,7 @@ How to build it:
 
 This project has a Maven structure but is not mavenized yet as the Apache Flex SDK is not at the moment, so, to build it, you will need to create a project based on those sources in your favorite IDE (I use IntelliJ).
 
-This project is compatible with Apache Flex SDK 4.13 which has not been released at the moment I'm writting, I use a nightly built version "Apache Flex 4.13.0 FP 11.5 AIR 3.5". (use the [Apache Flex Intaller 3.0] [2] -will be released in few days- to get it)
+This project is compatible with Apache Flex SDK 4.13 which has not been released at the moment I'm writting, I use a nightly built version "Apache Flex 4.13.0 FP 11.5 AIR 3.5". (use the [Apache Flex Intaller 3.1] [2] -will be released in few days- to get it)
 
 Why this minimum requirement ? Because from this version, debugging Workers is possible using FDB or any IDE which use it such as IntelliJ, because Flash Player 11.5 is the first version that allows you to use Worker, Condition and Mutex.
 
