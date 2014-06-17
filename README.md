@@ -3,6 +3,9 @@ easyWorker
 
 Flex / Air library to easily implement Workers.
 
+No more burden to create an other project and / or an extra SWF for your Worker,
+everything is in-memory, don't deal anymore with MessageChannel and other low level classes, use Thread an Events.
+
 How to use it ?
 ----
 
