@@ -5,7 +5,11 @@ The as3-commons-reflect library used by this project is licensed under the
     Apache Software License 2.0
     The project can be found here: http://www.as3commons.org/as3-commons-reflect/index.html
 
+A small amount of code has been used from the as3-commons-bytecode library which is licensed under the
+    Apache Software License 2.0
+    The project can be found here: http://www.as3commons.org/as3-commons-bytecode/index.html
+
 The as3swf code used by this project is licensed under the
-    The MIT License.
+    MIT License.
     Copyright (c) 2009 côdeazur brasil Ltda, Claus Wahlers
-    The project can be found here: https://github.com/claus/as3swf
+    The original project can be found here: https://github.com/claus/as3swf
