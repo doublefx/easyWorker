@@ -104,7 +104,7 @@ Now, to use your Runnable inside a Thread.
             <s:CheckBox label="PAUSED" selected="{_thread.isPaused}"/>
             <s:CheckBox label="TERMINATED" selected="{_thread.isTerminated}"/>
         </s:HGroup>
-        <s:Button click="_thread.resume()" label="Start"/>
+        <s:Button click="_thread.resume()" label="Start" enabled="{_thread.isPaused}"/>
     </s:VGroup>
 
 </s:Application>

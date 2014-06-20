@@ -56,26 +56,16 @@
 
         private function onThreadState(event:ThreadStateEvent):void {
             trace("Thread State: " + _thread.state);
-
-            switch (_thread.state) {
-                case ThreadState.RUNNING:
-                    _thread.pause();
-                    break;
-                case ThreadState.PAUSED:
-                    _thread.resume();
-                    break;
-                case ThreadState.RESUMED:
-                    _thread.terminate();
-                    break;
-            }
         }
 
         private function thread_resultHandler(event:ThreadResultEvent):void {
             result.text += event.result;
+            _thread.terminate();
         }
 
         private function thread_faultHandler(event:ThreadFaultEvent):void {
             result.text += event.fault.message;
+            _thread.terminate();
         }
 
         private function thread_progressHandler(event:ThreadProgressEvent):void {
@@ -90,7 +80,7 @@
             <s:CheckBox label="PAUSED" selected="{_thread.isPaused}"/>
             <s:CheckBox label="TERMINATED" selected="{_thread.isTerminated}"/>
         </s:HGroup>
-        <s:Button click="_thread.resume()" label="Start"/>
+        <s:Button click="_thread.resume()" label="Start" enabled="{_thread.isPaused}"/>
     </s:VGroup>
 
 </s:Application>
