@@ -29,8 +29,19 @@ public class ThreadActionResponseEvent extends Event {
     // Here to allow serialization.
     private static const NULL:String = "NULL";
 
+    /**
+     * Dispatch thru the CrossThreadDispatcher to indicate the runnable is ready for a Pause.
+     */
     public static const PAUSED:String = "paused";
+
+    /**
+     * Dispatch thru the CrossThreadDispatcher to indicate the runnable is ready for a Resume.
+     */
     public static const RESUMED:String = "resumed";
+
+    /**
+     * Dispatch thru the CrossThreadDispatcher to indicate the runnable is ready for a Terminate.
+     */
     public static const TERMINATED:String = "terminated";
 
     private var _type:String;

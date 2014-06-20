@@ -26,8 +26,22 @@ import flash.events.Event;
 [RemoteClass(alias="com.doublefx.as3.thread.event.ThreadActionRequestEvent")]
 public class ThreadActionRequestEvent extends Event {
 
+    /**
+     * The Thread has requested a Pause.
+     * Won't be catch if pause() has been called before Start()
+     */
     public static const PAUSE_REQUESTED:String = "pauseRequested";
+
+    /**
+     * The Thread has requested a Resume.
+     * Won't be catch if resume() has been called before Start()
+     */
     public static const RESUME_REQUESTED:String = "resumeRequested";
+
+    /**
+     * The Thread has requested a Terminate.
+     * Won't be catch if terminate() has been called before Start()
+     */
     public static const TERMINATE_REQUESTED:String = "terminateRequested";
 
     public function ThreadActionRequestEvent(type:String = null) {

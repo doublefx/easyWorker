@@ -24,7 +24,6 @@ package com.doublefx.as3.thread.util {
 import avmplus.getQualifiedClassName;
 
 import com.doublefx.as3.error.NotImplementedRunnableError;
-
 import com.doublefx.as3.thread.api.CrossThreadDispatcher;
 import com.doublefx.as3.thread.api.Runnable;
 import com.doublefx.as3.thread.event.ThreadActionRequestEvent;
@@ -32,14 +31,12 @@ import com.doublefx.as3.thread.event.ThreadActionResponseEvent;
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
 import com.doublefx.as3.thread.event.ThreadProgressEvent;
 import com.doublefx.as3.thread.event.ThreadResultEvent;
-import com.doublefx.as3.thread.util.Closure;
 
 import flash.events.Event;
 import flash.net.registerClassAlias;
 import flash.system.MessageChannel;
 import flash.system.Worker;
 import flash.utils.getDefinitionByName;
-import flash.utils.setTimeout;
 
 import mx.core.DebuggableWorker;
 
@@ -165,7 +162,7 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
         }
     }
 
-    private function pause(e:Event = null):void {
+    private function pause(e:ThreadActionResponseEvent = null):void {
         _paused = true;
         removeEventListener(ThreadActionResponseEvent.PAUSED, pause);
         dispatchActionResponse(new ThreadActionResponseEvent(ThreadActionResponseEvent.PAUSED));
@@ -188,14 +185,15 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     }
 
     protected function resumeRequested():void {
-        if (this.hasEventListener(ThreadActionRequestEvent.RESUME_REQUESTED))
+        if (this.hasEventListener(ThreadActionRequestEvent.RESUME_REQUESTED)) {
+            addEventListener(ThreadActionResponseEvent.RESUMED, resume);
             dispatchEvent(new ThreadActionRequestEvent(ThreadActionRequestEvent.RESUME_REQUESTED));
-        else {
+        } else {
             resume();
         }
     }
 
-    private function resume(e:Event = null):void {
+    private function resume(e:ThreadActionResponseEvent = null):void {
         _paused = false;
         removeEventListener(ThreadActionResponseEvent.RESUMED, resume);
         dispatchActionResponse(new ThreadActionResponseEvent(ThreadActionResponseEvent.RESUMED));
@@ -203,16 +201,18 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
 
     protected function terminateRequested():void {
         trace("ThreadRunner terminateRequested");
-        if (this.hasEventListener(ThreadActionRequestEvent.TERMINATE_REQUESTED))
+        if (this.hasEventListener(ThreadActionRequestEvent.TERMINATE_REQUESTED)) {
+            addEventListener(ThreadActionResponseEvent.TERMINATED, terminate);
             dispatchEvent(new ThreadActionRequestEvent(ThreadActionRequestEvent.TERMINATE_REQUESTED));
-        else {
+        } else {
             terminate();
         }
     }
 
-    private function terminate(e:Event = null):void {
+    private function terminate(e:ThreadActionResponseEvent = null):void {
         trace("ThreadRunner terminate");
         _paused = false;
+        removeEventListener(ThreadActionResponseEvent.TERMINATED, terminate);
         dispatchActionResponse(new ThreadActionResponseEvent(ThreadActionResponseEvent.TERMINATED));
         destroyRunnable();
     }
