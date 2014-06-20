@@ -17,26 +17,33 @@
  * limitations under the License.
  */
 
-package workers {
-import com.doublefx.as3.thread.api.CrossThreadDispatcher;
-import com.doublefx.as3.thread.api.Runnable;
+/**
+ * User: Frederic THOMAS Date: 20/06/2014 Time: 15:07
+ */
+package com.doublefx.as3.thread.util {
+public class Closure {
 
-// Don't need to extend Sprite anymore.
-public class SimpleWorker implements Runnable {
+    public static function create(context:Object, func:Function, ...pms):Function {
 
-    /**
-     * Mandatory declaration if you want your Worker be able to communicate.
-     * This CrossThreadDispatcher is injected at runtime.
-     */
-    public var dispatcher:CrossThreadDispatcher;
+        var f:Function = function ():* {
+            var target:* = arguments.callee.target;
+            var func:* = arguments.callee.func;
+            var params:* = arguments.callee.params;
 
-    public function add(v1:Number, v2:Number):Number {
-        return v1 + v2;
-    }
+            var len:Number = arguments.length;
+            var args:Array = new Array(len);
+            for (var i:Number = 0; i < len; i++)
+                args[i] = arguments[i];
 
-    // Implements Runnable interface
-    public function run(args:Array):void {
-        dispatcher.dispatchResult(add(args[0], args[1]));
+            args["push"].apply(args, params);
+            return func.apply(target, args);
+        };
+
+        var _f:Object = f;
+        _f.target = context;
+        _f.func = func;
+        _f.params = pms;
+        return f;
     }
 }
 }

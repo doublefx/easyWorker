@@ -23,21 +23,26 @@
 package com.doublefx.as3.thread.util {
 import avmplus.getQualifiedClassName;
 
+import com.doublefx.as3.error.NotImplementedRunnableError;
+
 import com.doublefx.as3.thread.api.CrossThreadDispatcher;
 import com.doublefx.as3.thread.api.Runnable;
+import com.doublefx.as3.thread.event.ThreadActionRequestEvent;
+import com.doublefx.as3.thread.event.ThreadActionResponseEvent;
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
 import com.doublefx.as3.thread.event.ThreadProgressEvent;
 import com.doublefx.as3.thread.event.ThreadResultEvent;
+import com.doublefx.as3.thread.util.Closure;
 
 import flash.events.Event;
 import flash.net.registerClassAlias;
 import flash.system.MessageChannel;
 import flash.system.Worker;
 import flash.utils.getDefinitionByName;
+import flash.utils.setTimeout;
 
 import mx.core.DebuggableWorker;
 
-[Exclude]
 /**
  * Basically a decorator for a Runnable implementation
  * allowing it to extend something else than Sprite if needed.
@@ -47,17 +52,22 @@ import mx.core.DebuggableWorker;
  *
  * This instance will be pass to the Runnable public var dispatcher:CrossThreadDispatcher
  * in order to delegate the sending of the events to the caller Thread.
- * Note: The event is not sent as it is, it is recreated from its data in the caller Thread.
  */
+[Exclude]
 public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatcher {
 
     private static const DISPATCHER_PROPERTY:String = "dispatcher";
-    public static const RUN_METHOD:String = "run";
     public static const REGISTER_ALIASES_METHOD:String = "registerClassAliases";
+    public static const RUN_METHOD:String = "run";
+    public static const PAUSE_REQUESTED:String = "pauseRequested";
+    public static const RESUME_REQUESTED:String = "resumeRequested";
+    public static const TERMINATE_REQUESTED:String = "terminateRequested";
 
     private var _runnable:Runnable;
     private var _incomingChannel:MessageChannel;
     private var _outgoingChannel:MessageChannel;
+    private var _paused:Boolean;
+    private var _callLater:Array;
 
     public function ThreadRunner():void {
         init();
@@ -66,6 +76,8 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     private function init():void {
 
         registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
+        registerClassAlias("com.doublefx.as3.thread.util.Closure", Closure);
+        registerClassAlias("com.doublefx.as3.thread.util.DecodedMessage", DecodedMessage);
 
         if (!Worker.current.isPrimordial) {
             _incomingChannel = Worker.current.getSharedProperty(getQualifiedClassName(this) + "incoming") as MessageChannel;
@@ -76,34 +88,151 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     }
 
     protected function onMessage(e:Event):void {
-        const args:Array = _incomingChannel.receive();
-
-        const runnableClassName:* = args.shift();
-        if (!_runnable) {
-            const alias:Class = getDefinitionByName(runnableClassName) as Class;
-            _runnable = new alias();
-            if (!(_runnable is Runnable))
-                throw new TypeError(_runnable + " must implement Runnable");
-        }
-
-        const funcName:* = args.shift();
-
-        if (funcName == RUN_METHOD || funcName == REGISTER_ALIASES_METHOD) {
-            const func:Function = this[funcName];
-            func.apply(null, args);
+        if (_incomingChannel.messageAvailable) {
+            const args:Array = getMessage();
+            doMessage(new DecodedMessage(args));
         }
     }
 
-    protected function run(args:Array):void {
+    protected function getMessage(blockUntilReceived:Boolean = false):Array {
+        return _incomingChannel.receive(blockUntilReceived);
+    }
 
-        if (_runnable) {
-            const hasDispatcherProperty:Boolean = DISPATCHER_PROPERTY in _runnable;
-            if (hasDispatcherProperty && _runnable[DISPATCHER_PROPERTY] == null) {
-                _runnable[DISPATCHER_PROPERTY] = this;
+    private function doMessage(decodedMessage:DecodedMessage):void {
+        if (!_runnable) {
+            const cls:Class = getDefinitionByName(decodedMessage.runnableClassName) as Class;
+            _runnable = new cls();
+            if (!(_runnable is Runnable))
+                throw new NotImplementedRunnableError(decodedMessage.runnableClassName);
+        }
+
+        const method:* = decodedMessage.functionName;
+
+        if (method == RUN_METHOD) {
+
+            this[method].apply(null, decodedMessage.args);
+
+        } else if (method == PAUSE_REQUESTED ||
+                method == RESUME_REQUESTED ||
+                method == TERMINATE_REQUESTED) {
+
+            this[method].call(null);
+
+        } else if (method == REGISTER_ALIASES_METHOD) {
+            this[method].call(null, decodedMessage.args);
+        }
+    }
+
+    /**
+     * @private
+     *
+     * Used to store and execute later the incoming call the function passed as argument as soon the Thread is running.
+     *
+     * @param fct The function passed as argument as soon the Thread is running.
+     */
+    private function callLater(fct:Function):void {
+        if (!_callLater)
+            _callLater = [];
+
+        _callLater[_callLater.length] = fct;
+    }
+
+    protected function run(...args):void {
+        invoke(_runnable.run, args);
+    }
+
+    private function invoke(func:Function, ...args):void {
+        const hasDispatcherProperty:Boolean = DISPATCHER_PROPERTY in _runnable;
+        if (hasDispatcherProperty && _runnable[DISPATCHER_PROPERTY] == null) {
+            _runnable[DISPATCHER_PROPERTY] = this;
+        }
+
+        try {
+            trace("ThreadRunner run");
+            func.apply(null, args);
+        } catch (e:Error) {
+            trace("got an Error in Run()" + e.message, e.getStackTrace());
+        }
+    }
+
+    protected function pauseRequested():void {
+        if (this.hasEventListener(ThreadActionRequestEvent.PAUSE_REQUESTED)) {
+            addEventListener(ThreadActionResponseEvent.PAUSED, pause);
+            dispatchEvent(new ThreadActionRequestEvent(ThreadActionRequestEvent.PAUSE_REQUESTED));
+        }
+        else {
+            pause();
+        }
+    }
+
+    private function pause(e:Event = null):void {
+        _paused = true;
+        removeEventListener(ThreadActionResponseEvent.PAUSED, pause);
+        dispatchActionResponse(new ThreadActionResponseEvent(ThreadActionResponseEvent.PAUSED));
+
+        while (_paused) {
+            var args:Array = getMessage(true);
+            const message:DecodedMessage = new DecodedMessage(args);
+            if (message.functionName == RESUME_REQUESTED || message.functionName == TERMINATE_REQUESTED) {
+                doMessage(message);
+                if (message.functionName == RESUME_REQUESTED)
+                    if (_callLater)
+                        while (_callLater.length > 0) {
+                            const fct:Function = _callLater.shift() as Function;
+                            fct();
+                        }
+            } else {
+                callLater(Closure.create(this, doMessage, message));
             }
-            _runnable.run(args);
-        } else
-            throw new TypeError(_runnable + " must implement Runnable");
+        }
+    }
+
+    protected function resumeRequested():void {
+        if (this.hasEventListener(ThreadActionRequestEvent.RESUME_REQUESTED))
+            dispatchEvent(new ThreadActionRequestEvent(ThreadActionRequestEvent.RESUME_REQUESTED));
+        else {
+            resume();
+        }
+    }
+
+    private function resume(e:Event = null):void {
+        _paused = false;
+        removeEventListener(ThreadActionResponseEvent.RESUMED, resume);
+        dispatchActionResponse(new ThreadActionResponseEvent(ThreadActionResponseEvent.RESUMED));
+    }
+
+    protected function terminateRequested():void {
+        trace("ThreadRunner terminateRequested");
+        if (this.hasEventListener(ThreadActionRequestEvent.TERMINATE_REQUESTED))
+            dispatchEvent(new ThreadActionRequestEvent(ThreadActionRequestEvent.TERMINATE_REQUESTED));
+        else {
+            terminate();
+        }
+    }
+
+    private function terminate(e:Event = null):void {
+        trace("ThreadRunner terminate");
+        _paused = false;
+        dispatchActionResponse(new ThreadActionResponseEvent(ThreadActionResponseEvent.TERMINATED));
+        destroyRunnable();
+    }
+
+    private function destroyRunnable():void {
+        trace("ThreadRunner destroyRunnable");
+
+        _runnable[DISPATCHER_PROPERTY] = null;
+        _runnable = null;
+
+        _incomingChannel.removeEventListener(Event.CHANNEL_MESSAGE, onMessage);
+        _incomingChannel.close();
+        _incomingChannel = null;
+
+        _outgoingChannel.close();
+        _outgoingChannel = null;
+    }
+
+    private function dispatchActionResponse(e:ThreadActionResponseEvent):void {
+        _outgoingChannel.send(e);
     }
 
     /**
@@ -116,7 +245,7 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
      *
      * @param aliases A vector of ClassAliases.
      */
-    public function registerClassAliases(aliases:Vector.<ClassAlias>):void {
+    protected function registerClassAliases(aliases:Vector.<ClassAlias>):void {
 
         for each (var classAlias:ClassAlias in aliases) {
             try {
@@ -139,10 +268,12 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     }
 
     public function dispatchError(error:Error):void {
+        trace("ThreadRunner dispatchError: " + error.message);
         _outgoingChannel.send(new ThreadFaultEvent(error));
     }
 
     public function dispatchResult(result:*):void {
+        trace("ThreadRunner dispatchResult: " + result);
         _outgoingChannel.send(new ThreadResultEvent(result));
     }
 }

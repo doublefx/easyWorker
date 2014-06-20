@@ -22,15 +22,23 @@
  */
 package {
 import com.doublefx.as3.thread.ComplexThreadTest;
-import com.doublefx.as3.thread.SimpleThreadTest;
+import com.doublefx.as3.thread.SimpleThreadTestStates;
+import com.doublefx.as3.thread.SimpleThreadTestWithNoArgs;
+import com.doublefx.as3.thread.SimpleThreadTestWithOneArgs;
+import com.doublefx.as3.thread.SimpleThreadTestWithTwoArgs;
 import com.doublefx.as3.thread.ThreadTestBase;
 
 [Suite]
 [RunWith("org.flexunit.runners.Suite")]
 public class TestSuite {
-
     public var testThreadWithNoRunnable:ThreadTestBase;
-    public var simpleTestThread:SimpleThreadTest;
-    public var complexTestThread:ComplexThreadTest;
+
+    public var simpleThreadTestWithNoArgs:SimpleThreadTestWithNoArgs;
+    public var simpleThreadTestWithOneArgs:SimpleThreadTestWithOneArgs;
+    public var simpleThreadTestWithTwoArgs:SimpleThreadTestWithTwoArgs;
+
+    public var complexThreadTest:ComplexThreadTest;
+
+    public var simpleThreadTestStates:SimpleThreadTestStates;
 }
 }

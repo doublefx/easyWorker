@@ -28,17 +28,8 @@ import flash.events.IEventDispatcher;
 /**
  * All we need to play with the Thread class.
  */
+[Bindable]
 public interface IThread extends IEventDispatcher{
-
-    /**
-     * Call a particular function on the Runnable.
-     * Should disappear, it is preferable to use Interfaces and Proxies instead.
-     *
-     * @param runnableClassName The Runnable class name.
-     * @param runnableMethod The method to call on the Runnable.
-     * @param args The arguments to pass to the workerMethod.
-     */
-    function command(runnableClassName:String, runnableMethod:String, ...args):void;
 
     /**
      * Start a Thread and call the Runnable's run method.
@@ -54,6 +45,7 @@ public interface IThread extends IEventDispatcher{
 
     /**
      * Pause a running Thread.
+     * All command send to the Thread will be delayed until resume has been called.
      *
      * @param milli Optional number of milliseconds to pause.
      */
@@ -75,8 +67,59 @@ public interface IThread extends IEventDispatcher{
     function get name():String;
 
     /**
-     * @see flash.system.WorkerState
+     * @see com.doublefx.as3.thread.ThreadState
      */
     function get state():String;
+
+    /**
+     * Return true if the Thread is new.
+     */
+    function get isNew():Boolean;
+
+    /**
+     * Return true if the Thread is running.
+     */
+    function get isRunning():Boolean;
+
+    /**
+     * Return true if the Thread is paused.
+     */
+    function get isPaused():Boolean;
+
+    /**
+     * Return true if the Thread is terminated.
+     */
+    function get isTerminated():Boolean;
+
+    /**
+     * Because the start, pause, resume and terminate function are asynchronous,
+     * return true when the relative function is call but not yet completed,
+     * return false when done (not Bindable).
+     */
+    function get isStarting():Boolean;
+
+
+    /**
+     * Because the start, pause, resume and terminate function are asynchronous,
+     * return true when the relative function is call but not yet completed,
+     * return false when done (not Bindable).
+     */
+    function get isPausing():Boolean;
+
+
+    /**
+     * Because the start, pause, resume and terminate function are asynchronous,
+     * return true when the relative function is call but not yet completed,
+     * return false when done (not Bindable).
+     */
+    function get isResuming():Boolean;
+
+
+    /**
+     * Because the start, pause, resume and terminate function are asynchronous,
+     * return true when the relative function is call but not yet completed,
+     * return false when done (not Bindable).
+     */
+    function get isTerminating():Boolean;
 }
 }

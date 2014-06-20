@@ -31,7 +31,7 @@ public class ComplexWorker implements Runnable {
      */
     public var dispatcher:CrossThreadDispatcher;
 
-    private function add(obj:TermsVo):Number {
+    public function add(obj:TermsVo):Number {
         return obj.v1 + obj.v2;
     }
 

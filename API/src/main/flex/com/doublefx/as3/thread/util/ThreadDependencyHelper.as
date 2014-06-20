@@ -37,6 +37,7 @@ import org.as3commons.reflect.as3commons_reflect;
 
 use namespace as3commons_reflect;
 
+[Exclude]
 public class ThreadDependencyHelper {
 
     // START: Copied from org.as3commons.bytecode.reflect.ByteCodeType

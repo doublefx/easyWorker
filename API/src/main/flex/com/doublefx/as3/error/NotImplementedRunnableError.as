@@ -18,33 +18,13 @@
  */
 
 /**
- * User: Frederic THOMAS Date: 14/06/2014 Time: 15:13
+ * User: Frederic THOMAS Date: 18/06/2014 Time: 13:42
  */
-package com.doublefx.as3.thread.event {
-import flash.events.Event;
+package com.doublefx.as3.error {
+public class NotImplementedRunnableError extends TypeError{
 
-[RemoteClass(alias="com.doublefx.as3.thread.event.ThreadFaultEvent")]
-public class ThreadFaultEvent extends Event {
-    public static const FAULT:String = "fault";
-
-    private var _fault:Error;
-
-    public function ThreadFaultEvent(fault:Error = null, bubbles:Boolean = false, cancelable:Boolean = false) {
-        super(FAULT, bubbles, cancelable);
-        _fault = fault;
-    }
-
-    public function get fault():Error {
-        return _fault;
-    }
-
-    public function set fault(value:Error):void {
-        _fault = value;
-    }
-
-    public override function clone():Event {
-        var evt:ThreadFaultEvent = new ThreadFaultEvent(fault, this.bubbles, this.cancelable);
-        return evt;
+    public function NotImplementedRunnableError(runnableName:String) {
+        super(runnableName + " must implement Runnable")
     }
 }
 }

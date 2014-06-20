@@ -18,33 +18,14 @@
  */
 
 /**
- * User: Frederic THOMAS Date: 14/06/2014 Time: 15:13
+ * User: Frederic THOMAS Date: 18/06/2014 Time: 11:04
  */
-package com.doublefx.as3.thread.event {
-import flash.events.Event;
-
-[RemoteClass(alias="com.doublefx.as3.thread.event.ThreadFaultEvent")]
-public class ThreadFaultEvent extends Event {
-    public static const FAULT:String = "fault";
-
-    private var _fault:Error;
-
-    public function ThreadFaultEvent(fault:Error = null, bubbles:Boolean = false, cancelable:Boolean = false) {
-        super(FAULT, bubbles, cancelable);
-        _fault = fault;
-    }
-
-    public function get fault():Error {
-        return _fault;
-    }
-
-    public function set fault(value:Error):void {
-        _fault = value;
-    }
-
-    public override function clone():Event {
-        var evt:ThreadFaultEvent = new ThreadFaultEvent(fault, this.bubbles, this.cancelable);
-        return evt;
-    }
+package com.doublefx.as3.thread {
+public class ThreadState {
+    public static const NEW:String = "new";
+    public static const RUNNING:String = "running";
+    public static const PAUSED:String = "paused";
+    public static const RESUMED:String = "resumed";
+    public static const TERMINATED:String = "terminated";
 }
 }

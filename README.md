@@ -18,6 +18,7 @@ You first implement a Runnable:
 package workers {
 import com.doublefx.as3.thread.api.CrossThreadDispatcher;
 import com.doublefx.as3.thread.api.Runnable;
+
 import workers.vo.TermsVo;
 
 // Don't need to extend Sprite anymore.
@@ -29,30 +30,14 @@ public class ComplexWorker implements Runnable {
      */
     public var dispatcher:CrossThreadDispatcher;
 
-    /**
-     * Implements Runnable interface.
-     *
-     * @Param args The elements of the args Array contain the
-     * values as you pass them to the Thread.
-     */
-    public function run(args:Array):void {
-
-        const values:TermsVo = args[0] as TermsVo;
-
-        // The dispatcher provides you functions to send the result,
-        // progress and faults occurring in your Worker.
-
-        dispatcher.dispatchResult(add(values));
+    public function add(obj:TermsVo):Number {
+        return obj.v1 + obj.v2;
     }
 
-    /**
-     * The task your worker is going to do, note that the library
-     * allows you to have complex workers which depend of other Classes
-     * and you don't need anymore to register the Class aliases,
-     * most of the time, it will be detected and managed for you.
-     */
-    private function add(obj:TermsVo):Number {
-        return obj.v1 + obj.v2;
+    // Implements Runnable interface
+    public function run(args:Array):void {
+        const values:TermsVo = args[0] as TermsVo;
+        dispatcher.dispatchResult(add(values));
     }
 }
 }
@@ -61,17 +46,68 @@ public class ComplexWorker implements Runnable {
 Now, to use your Runnable inside a Thread.
 
 ```ActionScript
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               applicationComplete="applicationCompleteHandler(event)">
+    <fx:Script><![CDATA[
+        import com.doublefx.as3.thread.Thread;
+        import com.doublefx.as3.thread.api.IThread;
+        import com.doublefx.as3.thread.event.ThreadFaultEvent;
+        import com.doublefx.as3.thread.event.ThreadProgressEvent;
+        import com.doublefx.as3.thread.event.ThreadResultEvent;
+        import com.doublefx.as3.thread.event.ThreadStateEvent;
+
+        import mx.events.FlexEvent;
+
+        import workers.ComplexWorker;
+        import workers.vo.TermsVo;
+
+        [Bindable]
         private var _thread:IThread;
 
         private function applicationCompleteHandler(event:FlexEvent):void {
-            _thread = new Thread(ComplexWorker, "nameOfMyThread");
+            _thread = new Thread(ComplexWorker, "complexRunnable");
 
+            _thread.addEventListener(ThreadStateEvent.THREAD_STATE, onThreadState);
             _thread.addEventListener(ThreadProgressEvent.PROGRESS, thread_progressHandler);
             _thread.addEventListener(ThreadResultEvent.RESULT, thread_resultHandler);
             _thread.addEventListener(ThreadFaultEvent.FAULT, thread_faultHandler);
 
+            //Start a Thread in Pause, click on Start to resume it.
+            _thread.pause();
             _thread.start(new TermsVo(1, 2));
         }
+
+        private function onThreadState(event:ThreadStateEvent):void {
+            trace("Thread State: " + _thread.state);
+        }
+
+        private function thread_resultHandler(event:ThreadResultEvent):void {
+            result.text += event.result;
+            _thread.terminate();
+        }
+
+        private function thread_faultHandler(event:ThreadFaultEvent):void {
+            result.text += event.fault.message;
+            _thread.terminate();
+        }
+
+        private function thread_progressHandler(event:ThreadProgressEvent):void {
+        }
+        ]]></fx:Script>
+
+    <s:VGroup>
+        <s:Label id="result" text="Result: "/>
+        <s:HGroup enabled="false">
+            <s:CheckBox label="NEW" selected="{Thread(_thread).isNew}"/>
+            <s:CheckBox label="RUNNING" selected="{Thread(_thread).isRunning}"/>
+            <s:CheckBox label="PAUSED" selected="{Thread(_thread).isPaused}"/>
+            <s:CheckBox label="TERMINATED" selected="{Thread(_thread).isTerminated}"/>
+        </s:HGroup>
+        <s:Button click="_thread.resume()" label="Start"/>
+    </s:VGroup>
+
+</s:Application>
 ```
 
 The Constructor of the Thread allows you to pass extra dependencies in case they are not
@@ -88,8 +124,9 @@ _thread = new Thread(ComplexWorker, "nameOfMyThread", extraDependencies, loaderI
 The IThread interface looks like that:
 
  ```ActionScript
+ [Bindable]
  public interface IThread extends IEventDispatcher{
- 
+
      /**
       * Start a Thread and call the Runnable's run method.
       *
@@ -104,6 +141,7 @@ The IThread interface looks like that:
 
      /**
       * Pause a running Thread.
+      * All command send to the Thread will be delayed until resume has been called.
       *
       * @param milli Optional number of milliseconds to pause.
       */
@@ -125,16 +163,67 @@ The IThread interface looks like that:
      function get name():String;
 
      /**
-      * @see flash.system.WorkerState
+      * @see com.doublefx.as3.thread.ThreadState
       */
      function get state():String;
+
+     /**
+      * Return true if the Thread is new.
+      */
+     function get isNew():Boolean;
+
+     /**
+      * Return true if the Thread is running.
+      */
+     function get isRunning():Boolean;
+
+     /**
+      * Return true if the Thread is paused.
+      */
+     function get isPaused():Boolean;
+
+     /**
+      * Return true if the Thread is terminated.
+      */
+     function get isTerminated():Boolean;
+
+     /**
+      * Because the start, pause, resume and terminate function are asynchronous,
+      * return true when the relative function is call but not yet completed,
+      * return false when done (not Bindable).
+      */
+     function get isStarting():Boolean;
+
+
+     /**
+      * Because the start, pause, resume and terminate function are asynchronous,
+      * return true when the relative function is call but not yet completed,
+      * return false when done (not Bindable).
+      */
+     function get isPausing():Boolean;
+
+
+     /**
+      * Because the start, pause, resume and terminate function are asynchronous,
+      * return true when the relative function is call but not yet completed,
+      * return false when done (not Bindable).
+      */
+     function get isResuming():Boolean;
+
+
+     /**
+      * Because the start, pause, resume and terminate function are asynchronous,
+      * return true when the relative function is call but not yet completed,
+      * return false when done (not Bindable).
+      */
+     function get isTerminating():Boolean;
+ }
+ state():String;
  }
 ```
 
 Note: This is an early stage version, many things have to come:
 
-- Pause and Resume are not implemented yet.
-- Terminate has still a basic implementation.
 - More to come to interact with your Runnable from the Thread.
 
 The [Issues] [1] is a good place to ask things and raise issues indeed.

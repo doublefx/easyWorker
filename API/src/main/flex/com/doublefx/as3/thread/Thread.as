@@ -21,12 +21,18 @@
  * User: Frederic THOMAS Date: 13/06/2014 Time: 17:18
  */
 package com.doublefx.as3.thread {
+import com.doublefx.as3.error.NotImplementedRunnableError;
 import com.doublefx.as3.thread.api.IThread;
+import com.doublefx.as3.thread.event.ThreadActionRequestEvent;
+import com.doublefx.as3.thread.event.ThreadActionResponseEvent;
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
 import com.doublefx.as3.thread.event.ThreadProgressEvent;
 import com.doublefx.as3.thread.event.ThreadResultEvent;
+import com.doublefx.as3.thread.event.ThreadStateEvent;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;
 import com.doublefx.as3.thread.util.ClassAlias;
+import com.doublefx.as3.thread.util.Closure;
+import com.doublefx.as3.thread.util.DecodedMessage;
 import com.doublefx.as3.thread.util.ThreadDependencyHelper;
 import com.doublefx.as3.thread.util.ThreadRunner;
 import com.doublefx.as3.thread.util.WorkerFactory;
@@ -42,6 +48,7 @@ import flash.net.registerClassAlias;
 import flash.system.ApplicationDomain;
 import flash.system.Capabilities;
 import flash.system.MessageChannel;
+import flash.system.MessageChannelState;
 import flash.system.Worker;
 import flash.system.WorkerDomain;
 import flash.system.WorkerState;
@@ -53,11 +60,10 @@ import mx.collections.ArrayList;
 import mx.core.FlexGlobals;
 
 import org.as3commons.lang.ClassUtils;
-
-import org.as3commons.lang.ClassUtils;
 import org.as3commons.lang.StringUtils;
 import org.as3commons.reflect.Type;
 
+[Event(name="fault", type="com.doublefx.as3.thread.event.ThreadStateEvent")]
 [Event(name="progress", type="com.doublefx.as3.thread.event.ThreadProgressEvent")]
 [Event(name="result", type="com.doublefx.as3.thread.event.ThreadResultEvent")]
 [Event(name="fault", type="com.doublefx.as3.thread.event.ThreadFaultEvent")]
@@ -65,6 +71,7 @@ import org.as3commons.reflect.Type;
 /**
  * Create and Manage a Worker for a given Runnable.
  */
+[Bindable]
 public final class Thread extends EventDispatcher implements IThread {
 
     private static var __internalDependencies:Vector.<ClassAlias>;
@@ -82,14 +89,32 @@ public final class Thread extends EventDispatcher implements IThread {
     private var _callLater:Array;
 
     private var _dependencies:ArrayList;
+    private var _workerReady:Boolean;
+
+    private var _isNew:Boolean = true;
+    private var _isRunning:Boolean;
+    private var _isPaused:Boolean;
+    private var _isTerminated:Boolean;
+
+    private var _isStarting:Boolean;
+    private var _isPausing:Boolean;
+    private var _isResuming:Boolean;
+    private var _isTerminating:Boolean;
+
+    private var _currentState:String = ThreadState.NEW;
 
     {
         __internalDependencies = new Vector.<ClassAlias>();
 
         __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
+        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.util.Closure", Closure);
+        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.util.DecodedMessage", DecodedMessage);
         __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadFaultEvent", ThreadFaultEvent);
         __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadResultEvent", ThreadResultEvent);
         __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadProgressEvent", ThreadProgressEvent);
+        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadActionRequestEvent", ThreadActionRequestEvent);
+        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadActionResponseEvent", ThreadActionResponseEvent);
+        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.error.NotImplementedRunnableError", NotImplementedRunnableError);
     }
 
     {
@@ -117,6 +142,8 @@ public final class Thread extends EventDispatcher implements IThread {
         __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadFaultEvent", ThreadFaultEvent);
         __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadResultEvent", ThreadResultEvent);
         __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadProgressEvent", ThreadProgressEvent);
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadActionResponseEvent", ThreadActionResponseEvent);
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.error.NotImplementedRunnableError", NotImplementedRunnableError);
     }
 
 
@@ -134,16 +161,17 @@ public final class Thread extends EventDispatcher implements IThread {
             _id = ++__count;
             _name = name;
 
-            registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
-
             if (runnable) {
+                registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
+                registerClassAlias("com.doublefx.as3.thread.util.DecodedMessage", DecodedMessage);
+
                 loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
-                domain ||= ApplicationDomain.currentDomain;
+                domain ||= loaderInfo.applicationDomain;
                 _runnableClassName = ClassUtils.getFullyQualifiedName(runnable, true);
 
                 if (loaderInfo && domain) {
 
-                    reflect(domain, extraDependencies);
+                    extraDependencies = reflect(domain, extraDependencies);
 
                     _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies.toArray(), Capabilities.isDebugger);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
@@ -165,7 +193,7 @@ public final class Thread extends EventDispatcher implements IThread {
         }
     }
 
-    private function reflect(domain:ApplicationDomain, extraDependencies:Vector.<ClassAlias>):void {
+    private function reflect(domain:ApplicationDomain, extraDependencies:Vector.<ClassAlias>):Vector.<ClassAlias> {
         var classAlias:ClassAlias;
 
         const threadRunnerClassName:String = ClassUtils.getFullyQualifiedName(ThreadRunner, true);
@@ -202,20 +230,36 @@ public final class Thread extends EventDispatcher implements IThread {
                     ThreadDependencyHelper.addUniquely(qualifiedName, _dependencies);
                 }
             }
+
+        return extraDependencies;
     }
 
     ////////////////////////////
     // IThread Implementation //
     ////////////////////////////
 
-    public function command(runnableClassName:String, runnableMethod:String, ...args):void {
-        args.unshift(runnableMethod);
-        args.unshift(runnableClassName);
-        _outgoingChannel.send(args);
+    /**
+     * Call a particular function on the Runnable.
+     * Should disappear, it is preferable to use Interfaces and Proxies instead.
+     *
+     * @param runnableClassName The Runnable class name.
+     * @param runnableMethod The method to call on the Runnable.
+     * @param args The arguments to pass to the workerMethod.
+     */
+    private function command(runnableClassName:String, runnableMethod:String, ...args):void {
+        if (_worker) {
+            args.unshift(runnableMethod);
+            args.unshift(runnableClassName);
+
+            if (_outgoingChannel && _outgoingChannel.state == MessageChannelState.OPEN)
+                _outgoingChannel.send(args);
+        }
     }
 
     public function start(...args):void {
-        if (_worker) {
+        if (!_isStarting && _worker && _isNew) {
+            trace("Thread start");
+            _isStarting = true;
             callLater(function ():void {
                 command(_runnableClassName, ThreadRunner.RUN_METHOD, args);
             });
@@ -223,17 +267,65 @@ public final class Thread extends EventDispatcher implements IThread {
         }
     }
 
-    public function terminate():void {
-        // Not correctly implemented yet
-        _worker.terminate();
+    public function pause(milli:Number = 0):void {
+        if (!_workerReady) {
+            callLater(function ():void {
+                doPause(milli);
+            });
+        } else doPause(milli);
     }
 
-    public function pause(milli:Number = 0):void {
-        notImplementedYet()
+    private function doPause(milli:Number):void {
+        if (!_isPausing && _worker && _isRunning) {
+            _isPausing = true;
+            command(_runnableClassName, ThreadRunner.PAUSE_REQUESTED, null);
+            if (milli)
+                setTimeout(resume, milli);
+        }
     }
 
     public function resume():void {
-        notImplementedYet();
+        if (!_workerReady) {
+            callLater(doResume);
+        } else doResume();
+    }
+
+    private function doResume():void {
+        if (!_isResuming && _worker && _isPaused) {
+            _isResuming = true;
+            command(_runnableClassName, ThreadRunner.RESUME_REQUESTED, null);
+        }
+    }
+
+    public function terminate():void {
+        if (!_workerReady) {
+            trace("Thread call later terminate");
+            callLater(doTerminate);
+        } else doTerminate();
+    }
+
+    private function doTerminate():void {
+        trace("Thread terminate");
+        if (!_isTerminating && _worker && !_isTerminated) {
+            _isTerminating = true;
+            command(_runnableClassName, ThreadRunner.TERMINATE_REQUESTED, null);
+        }
+    }
+
+    public function get isStarting():Boolean {
+        return _isStarting;
+    }
+
+    public function get isPausing():Boolean {
+        return _isPausing;
+    }
+
+    public function get isResuming():Boolean {
+        return _isResuming;
+    }
+
+    public function get isTerminating():Boolean {
+        return _isTerminating;
     }
 
     public function get id():uint {
@@ -245,9 +337,28 @@ public final class Thread extends EventDispatcher implements IThread {
     }
 
     public function get state():String {
-        return _worker ? _worker.state : null;
+        return _currentState;
     }
 
+    public function get isNew():Boolean {
+        return _isNew;
+    }
+
+    public function get isRunning():Boolean {
+        return _isRunning;
+    }
+
+    public function get isPaused():Boolean {
+        return _isPaused;
+    }
+
+    public function get isTerminated():Boolean {
+        return _isTerminated;
+    }
+
+    /////////////////////////////
+    // Internal Implementation //
+    /////////////////////////////
     thread_diagnostic function get worker():Worker {
         return _worker as Worker;
     }
@@ -273,21 +384,89 @@ public final class Thread extends EventDispatcher implements IThread {
     /////////////////////
 
     private function onWorkerState(e:Event):void {
-        const event:Event = new Event(e.type, e.bubbles, e.cancelable);
+
+        const worker:Worker = e.currentTarget as Worker;
+
+        switch (worker.state) {
+            case WorkerState.RUNNING:
+                isNew = false;
+                isRunning = true;
+                _isStarting = false;
+                _currentState = ThreadState.RUNNING;
+                break;
+            case WorkerState.TERMINATED:
+                trace("Thread onWorkerState: TERMINATED");
+                isRunning = isPaused = false;
+                _isTerminating = false;
+                isTerminated = true;
+                destroyWorker();
+                _currentState = ThreadState.TERMINATED;
+                break;
+            default:
+                return;
+        }
+
+        const event:ThreadStateEvent = new ThreadStateEvent(_currentState);
         dispatchEvent(event);
 
         // Call the delayed Runnable's method calls if the worker state is running and default not prevented.
-        if (_worker.state == WorkerState.RUNNING && !event.isDefaultPrevented()) {
+        if (_isRunning && !event.isDefaultPrevented()) {
             while (_callLater.length > 0) {
                 const fct:Function = _callLater.shift() as Function;
-                setTimeout(fct, 200);
+                fct();
             }
         }
     }
 
     private function onMessage(e:Event):void {
-        const event:Event = _incomingChannel.receive();
+        var event:Event = _incomingChannel.receive();
+
+        if (event is ThreadActionResponseEvent) {
+            const response:ThreadActionResponseEvent = event as ThreadActionResponseEvent;
+            switch (response.type) {
+                case ThreadActionResponseEvent.PAUSED:
+                    isRunning = false;
+                    isPaused = true;
+                    _isPausing = false;
+                    _currentState = ThreadState.PAUSED;
+                    event = new ThreadStateEvent(ThreadState.PAUSED);
+                    break;
+                case ThreadActionResponseEvent.RESUMED:
+                    isRunning = true;
+                    isPaused = false;
+                    _isResuming = false;
+                    _currentState = ThreadState.RESUMED;
+                    event = new ThreadStateEvent(ThreadState.RESUMED);
+                    break;
+                case ThreadActionResponseEvent.TERMINATED:
+                    isRunning = false;
+                    isPaused = false;
+                    isTerminated = true;
+                    terminateWorker();
+                    break;
+                default:
+                    return;
+            }
+        }
         dispatchEvent(event);
+    }
+
+    private function terminateWorker():void {
+        trace("Thread terminateWorker");
+        _worker.terminate();
+    }
+
+    private function destroyWorker():void {
+        trace("Thread destroyWorker");
+        _worker.removeEventListener(Event.WORKER_STATE, onWorkerState);
+
+        _incomingChannel.removeEventListener(Event.CHANNEL_MESSAGE, onMessage);
+        _incomingChannel.close();
+        _incomingChannel = null;
+
+        _outgoingChannel.close();
+        _outgoingChannel = null;
+        _worker = null;
     }
 
     /**
@@ -326,11 +505,14 @@ public final class Thread extends EventDispatcher implements IThread {
 
         var args:Array = [_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliases];
 
-        if (_worker.state == WorkerState.RUNNING)
+        if (_worker && _worker.state == WorkerState.RUNNING)
             _outgoingChannel.send(args);
         else
             callLater(function ():void {
-                _outgoingChannel.send(args)
+                if (_outgoingChannel && _outgoingChannel.state == MessageChannelState.OPEN) {
+                    _outgoingChannel.send(args);
+                    _workerReady = true;
+                }
             });
     }
 
@@ -355,8 +537,32 @@ public final class Thread extends EventDispatcher implements IThread {
         dispatchEvent(event);
     }
 
-    private static function notImplementedYet():void {
-        throw new Error("Not implemented yet !!");
+    /**
+     * Here for convenient binding, don't try to set it.
+     */
+    private function set isNew(value:Boolean):void {
+        _isNew = value;
+    }
+
+    /**
+     * Here for convenient binding, don't try to set it.
+     */
+    private function set isRunning(value:Boolean):void {
+        _isRunning = value;
+    }
+
+    /**
+     * Here for convenient binding, don't try to set it.
+     */
+    private function set isPaused(value:Boolean):void {
+        _isPaused = value;
+    }
+
+    /**
+     * Here for convenient binding, don't try to set it.
+     */
+    private function set isTerminated(value:Boolean):void {
+        _isTerminated = value;
     }
 }
 }

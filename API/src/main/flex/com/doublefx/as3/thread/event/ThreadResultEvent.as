@@ -38,13 +38,13 @@ public class ThreadResultEvent extends Event {
         return _result;
     }
 
+    public function set result(value:*):void {
+        _result = value;
+    }
+
     public override function clone():Event {
         var evt:ThreadResultEvent = new ThreadResultEvent(_result, this.bubbles, this.cancelable);
         return evt;
-    }
-
-    public function set result(value:*):void {
-        _result = value;
     }
 }
 }

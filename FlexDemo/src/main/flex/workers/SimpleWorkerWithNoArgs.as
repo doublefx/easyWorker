@@ -17,34 +17,26 @@
  * limitations under the License.
  */
 
-/**
- * User: Frederic THOMAS Date: 14/06/2014 Time: 15:13
- */
-package com.doublefx.as3.thread.event {
-import flash.events.Event;
+package workers {
+import com.doublefx.as3.thread.api.CrossThreadDispatcher;
+import com.doublefx.as3.thread.api.Runnable;
 
-[RemoteClass(alias="com.doublefx.as3.thread.event.ThreadFaultEvent")]
-public class ThreadFaultEvent extends Event {
-    public static const FAULT:String = "fault";
+// Don't need to extend Sprite anymore.
+public class SimpleWorkerWithNoArgs implements Runnable {
 
-    private var _fault:Error;
+    /**
+     * Mandatory declaration if you want your Worker be able to communicate.
+     * This CrossThreadDispatcher is injected at runtime.
+     */
+    public var dispatcher:CrossThreadDispatcher;
 
-    public function ThreadFaultEvent(fault:Error = null, bubbles:Boolean = false, cancelable:Boolean = false) {
-        super(FAULT, bubbles, cancelable);
-        _fault = fault;
+    public function add(v1:Number, v2:Number):Number {
+        return v1 + v2;
     }
 
-    public function get fault():Error {
-        return _fault;
-    }
-
-    public function set fault(value:Error):void {
-        _fault = value;
-    }
-
-    public override function clone():Event {
-        var evt:ThreadFaultEvent = new ThreadFaultEvent(fault, this.bubbles, this.cancelable);
-        return evt;
+    // Implements Runnable interface
+    public function run(args:Array):void {
+        dispatcher.dispatchResult(add(1, 2));
     }
 }
 }

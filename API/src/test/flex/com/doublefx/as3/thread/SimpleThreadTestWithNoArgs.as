@@ -24,25 +24,27 @@ package com.doublefx.as3.thread {
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
 import com.doublefx.as3.thread.event.ThreadResultEvent;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;
-import workers.SimpleWorker;
 
 import flash.system.MessageChannelState;
 import flash.system.WorkerState;
 
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
+import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertNotNull;
 import org.flexunit.asserts.assertTrue;
 import org.flexunit.asserts.fail;
 import org.flexunit.async.Async;
 
+import workers.SimpleWorkerWithNoArgs;
+
 use namespace thread_diagnostic;
 
-public class SimpleThreadTest extends ThreadTestBase {
+public class SimpleThreadTestWithNoArgs extends ThreadTestBase {
 
     [Before]
     override public function setUp():void {
-        _thread = new Thread(SimpleWorker, "simpleRunnable", null, loaderInfo, currentDomain);
+        _thread = new Thread(SimpleWorkerWithNoArgs, "simpleRunnable", null, loaderInfo, currentDomain);
     }
 
     [Test(description="Verify the name of the Thread")]
@@ -65,10 +67,14 @@ public class SimpleThreadTest extends ThreadTestBase {
         const dependencies:Array = ["mx.core.DebuggableWorker",
             "com.doublefx.as3.thread.api.CrossThreadDispatcher",
             "com.doublefx.as3.thread.util.ClassAlias",
+            "com.doublefx.as3.thread.util.DecodedMessage",
             "com.doublefx.as3.thread.event.ThreadFaultEvent",
             "com.doublefx.as3.thread.event.ThreadResultEvent",
             "com.doublefx.as3.thread.event.ThreadProgressEvent",
-            "workers.SimpleWorker",
+            "com.doublefx.as3.thread.event.ThreadActionRequestEvent",
+            "com.doublefx.as3.thread.event.ThreadActionResponseEvent",
+            "com.doublefx.as3.thread.error.NotImplementedRunnableError",
+            "workers.SimpleWorkerWithNoArgs",
             "com.doublefx.as3.thread.api.Runnable"];
 
         assertThat(Thread(_thread).dependencies.toArray(), arrayExact(dependencies));
@@ -76,7 +82,7 @@ public class SimpleThreadTest extends ThreadTestBase {
 
     [Test(description="Verify the Runnable class name")]
     override public function testRunnableClassName():void {
-        assertEquals(Thread(_thread).runnableClassName, "workers.SimpleWorker");
+        assertEquals(Thread(_thread).runnableClassName, "workers.SimpleWorkerWithNoArgs");
     }
 
     [Test(description="Verify the Worker has been created")]
@@ -108,25 +114,16 @@ public class SimpleThreadTest extends ThreadTestBase {
     public function testStartThreadWithValidValues():void {
         _thread.addEventListener(ThreadResultEvent.RESULT, Async.asyncHandler(this, thread_resultHandler, 2000, null, thread_faultHandler), false, 0, true);
         _thread.addEventListener(ThreadFaultEvent.FAULT, thread_faultHandler);
-        _thread.start(1, 2);
+        _thread.start();
     }
 
-    protected static function thread_resultHandler(event:ThreadResultEvent, passThroughData:Object = null):void {
+    protected function thread_resultHandler(event:ThreadResultEvent, passThroughData:Object = null):void {
+        testStateRunning();
         assertEquals(event.result, 3);
     }
 
-    [Test(async, description="Verify the Runnable 'run' method can be call with invalide primitive values")]
-    public function testStartThreadWithNotValidValues():void {
-        _thread.addEventListener(ThreadResultEvent.RESULT, Async.asyncHandler(this, thread_resultHandlerNaN, 2000, null, thread_faultHandler), false, 0, true);
-        _thread.addEventListener(ThreadFaultEvent.FAULT, thread_faultHandler);
-        _thread.start("A", 2);
-    }
-
-    protected static function thread_resultHandlerNaN(event:ThreadResultEvent, passThroughData:Object = null):void {
-        assertTrue(isNaN(event.result));
-    }
-
-    protected static function thread_faultHandler(event:ThreadFaultEvent, passThroughData:Object = null):void {
+    protected function thread_faultHandler(event:ThreadFaultEvent, passThroughData:Object = null):void {
+        testStateRunning();
         fail(event.fault.message);
     }
 }

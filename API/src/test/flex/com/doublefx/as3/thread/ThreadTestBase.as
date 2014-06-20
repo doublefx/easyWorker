@@ -28,6 +28,8 @@ import com.doublefx.as3.thread.api.IThread;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;
 
 import flash.display.LoaderInfo;
+
+import flash.display.LoaderInfo;
 import flash.system.ApplicationDomain;
 
 import flash.system.WorkerState;
@@ -35,10 +37,12 @@ import flash.system.WorkerState;
 import mx.core.FlexGlobals;
 
 import org.flexunit.asserts.assertEquals;
+import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertNotNull;
 import org.flexunit.asserts.assertNull;
 import org.flexunit.asserts.assertTrue;
 import org.hamcrest.Matcher;
+import org.hamcrest.assertThat;
 
 use namespace thread_diagnostic;
 
@@ -49,7 +53,7 @@ public class ThreadTestBase {
 
     public function ThreadTestBase() {
         loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
-        currentDomain ||= ApplicationDomain.currentDomain;
+        currentDomain ||= LoaderInfo(FlexGlobals.topLevelApplication.loaderInfo).applicationDomain;
     }
 
     protected var _thread:IThread;
@@ -59,6 +63,11 @@ public class ThreadTestBase {
         _thread = new Thread();
     }
 
+
+    [After]
+    public function tearDown():void {
+        _thread.terminate();
+    }
 
     [Test (description="The Thread should have been created")]
     public function testThreadHasBeenCreated():void {
@@ -77,7 +86,7 @@ public class ThreadTestBase {
 
     [Test (description="Verify the state of the Thread before the start method has been called")]
     public function testStateBeforeStart():void {
-        assertNull("Should be null as no Runnable has been passed to the constructor", _thread.state);
+        testStateNew();
     }
 
     [Test (description="Verify dependencies")]
@@ -103,6 +112,49 @@ public class ThreadTestBase {
     [Test (description="Verify the outgoing message channel has been created")]
     public function testOutgoingMessageChannelExistence():void {
         assertNull("Should be null" ,Thread(_thread).outgoingChannel);
+    }
+
+    protected function testStateNew():void {
+        assertEquals("Should be NEW", ThreadState.NEW, _thread.state);
+        assertTrue("isNew() should return true", _thread.isNew);
+        assertFalse("isRunning should return false", _thread.isRunning);
+        assertFalse("isPaused should return false", _thread.isPaused);
+        assertFalse("isTerminated should return false", _thread.isTerminated);
+    }
+
+    protected function testStateRunning():void {
+        assertEquals("Should be RUNNING", ThreadState.RUNNING, _thread.state);
+        assertFalse("isNew() should return false", _thread.isNew);
+        assertTrue("isRunning should return true", _thread.isRunning);
+        assertFalse("isPaused should return false", _thread.isPaused);
+        assertFalse("isTerminated should return false", _thread.isTerminated);
+    }
+
+    protected function testStatePaused():void {
+        assertEquals("Should be PAUSED", ThreadState.PAUSED, _thread.state);
+        assertFalse("isNew() should return false", _thread.isNew);
+        assertFalse("isRunning should return false", _thread.isRunning);
+        assertTrue("isPaused should return true", _thread.isPaused);
+        assertFalse("isTerminated should return false", _thread.isTerminated);
+        assertFalse(_thread.isPausing);
+    }
+
+    protected function testStateResumed():void {
+        assertEquals("Should be RESUMED", ThreadState.RESUMED, _thread.state);
+        assertFalse("isNew() should return false", _thread.isNew);
+        assertTrue("isRunning should return true", _thread.isRunning);
+        assertFalse("isPaused should return false", _thread.isPaused);
+        assertFalse("isTerminated should return false", _thread.isTerminated);
+        assertFalse(_thread.isResuming);
+    }
+
+    protected function testStateTerminated():void {
+        assertEquals("Should be TERMINATED", ThreadState.TERMINATED, _thread.state);
+        assertFalse("isNew() should return false", _thread.isNew);
+        assertFalse("isRunning should return false", _thread.isRunning);
+        assertFalse("isPaused should return false", _thread.isPaused);
+        assertTrue("isTerminated should return true", _thread.isTerminated);
+        assertFalse(_thread.isTerminating);
     }
 
     /**

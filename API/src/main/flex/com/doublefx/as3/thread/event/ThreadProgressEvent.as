@@ -44,17 +44,17 @@ public class ThreadProgressEvent extends Event {
         return _total;
     }
 
-    public override function clone():Event {
-        var evt:ThreadProgressEvent = new ThreadProgressEvent(_current, _total, this.bubbles, this.cancelable);
-        return evt;
-    }
-
     public function set current(value:uint):void {
         _current = value;
     }
 
     public function set total(value:uint):void {
         _total = value;
+    }
+
+    public override function clone():Event {
+        var evt:ThreadProgressEvent = new ThreadProgressEvent(_current, _total, this.bubbles, this.cancelable);
+        return evt;
     }
 }
 }

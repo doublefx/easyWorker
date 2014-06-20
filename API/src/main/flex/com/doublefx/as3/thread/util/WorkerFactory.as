@@ -40,6 +40,7 @@ import flash.system.WorkerDomain;
 import flash.utils.ByteArray;
 import flash.utils.getQualifiedClassName;
 
+[Exclude]
 public class WorkerFactory {
 
     /**

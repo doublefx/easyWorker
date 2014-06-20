@@ -30,37 +30,56 @@
         import com.doublefx.as3.thread.event.ThreadFaultEvent;
         import com.doublefx.as3.thread.event.ThreadProgressEvent;
         import com.doublefx.as3.thread.event.ThreadResultEvent;
+        import com.doublefx.as3.thread.event.ThreadStateEvent;
 
         import mx.events.FlexEvent;
 
         import workers.ComplexWorker;
         import workers.vo.TermsVo;
 
+        [Bindable]
         private var _thread:IThread;
 
         private function applicationCompleteHandler(event:FlexEvent):void {
             _thread = new Thread(ComplexWorker, "complexRunnable");
-            _thread.addEventListener(Event.WORKER_STATE, onWorkerState);
+
+            _thread.addEventListener(ThreadStateEvent.THREAD_STATE, onThreadState);
             _thread.addEventListener(ThreadProgressEvent.PROGRESS, thread_progressHandler);
             _thread.addEventListener(ThreadResultEvent.RESULT, thread_resultHandler);
             _thread.addEventListener(ThreadFaultEvent.FAULT, thread_faultHandler);
+
+            //Start a Thread in Pause, click on Start to resume it.
+            _thread.pause();
             _thread.start(new TermsVo(1, 2));
         }
 
-        private function onWorkerState(event:Event):void {
-            var state:String = _thread.state;
+        private function onThreadState(event:ThreadStateEvent):void {
+            trace("Thread State: " + _thread.state);
         }
 
         private function thread_resultHandler(event:ThreadResultEvent):void {
-            result.text = event.result;
+            result.text += event.result;
+            _thread.terminate();
         }
 
         private function thread_faultHandler(event:ThreadFaultEvent):void {
-            result.text = event.fault.message;
+            result.text += event.fault.message;
+            _thread.terminate();
         }
 
         private function thread_progressHandler(event:ThreadProgressEvent):void {
         }
         ]]></fx:Script>
-    <s:Label id="result"/>
+
+    <s:VGroup>
+        <s:Label id="result" text="Result: "/>
+        <s:HGroup enabled="false">
+            <s:CheckBox label="NEW" selected="{Thread(_thread).isNew}"/>
+            <s:CheckBox label="RUNNING" selected="{Thread(_thread).isRunning}"/>
+            <s:CheckBox label="PAUSED" selected="{Thread(_thread).isPaused}"/>
+            <s:CheckBox label="TERMINATED" selected="{Thread(_thread).isTerminated}"/>
+        </s:HGroup>
+        <s:Button click="_thread.resume()" label="Start"/>
+    </s:VGroup>
+
 </s:Application>
