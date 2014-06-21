@@ -118,7 +118,7 @@ allowing you to pass them back and forth the Thread:
 const extraDependencies:Vector.<ClassAlias> = new Vector.<ClassAlias>();
 extraDependencies[0] = new ClassAlias("workers.vo.TermsVo", TermsVo);
 
-_thread = new Thread(ComplexWorker, "nameOfMyThread", extraDependencies, loaderInfo, currentDomain);
+_thread = new Thread(ComplexWorker, "nameOfMyThread", false, extraDependencies, loaderInfo, workerDomain);
 ```
 
 You can intercept a call to pause, resume and terminate from your Runnable, see:

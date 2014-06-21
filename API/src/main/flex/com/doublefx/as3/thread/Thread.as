@@ -151,12 +151,13 @@ public final class Thread extends EventDispatcher implements IThread {
      *
      * @param runnable A class that implements Runnable.
      * @param name The name of the Thread.
+     * @param giveAppPrivileges (default = false) — indicates whether the worker should be given application sandbox privileges in AIR. This parameter is ignored in Flash Player
      * @param extraDependencies Some extra dependencies that can't be automatically discovered.
      * If you define a custom alias, do it using the RemoteClass tag, otherwise it will generate a TypeError: Error #1034
-     * @param loaderInfo The loader info where the code of the Runnable stands.
-     * @param domain The application domain on witch the Runnable is registered.
+     * @param loaderInfo The loader info where the code of this lib and the Runnable stands, FlexGlobals.topLevelApplication.loaderInfo if none is provided.
+     * @param workerDomain The Worker domain in which the Worker will be created, WorkerDomain.current if none is provided.
      */
-    public function Thread(runnable:Class = null, name:String = null, extraDependencies:Vector.<ClassAlias> = null, loaderInfo:LoaderInfo = null, domain:ApplicationDomain = null):void {
+    public function Thread(runnable:Class = null, name:String = null, giveAppPrivileges:Boolean = false, extraDependencies:Vector.<ClassAlias> = null, loaderInfo:LoaderInfo = null, workerDomain:WorkerDomain = null):void {
         if (WorkerDomain.isSupported) {
             _id = ++__count;
             _name = name;
@@ -164,14 +165,13 @@ public final class Thread extends EventDispatcher implements IThread {
             if (runnable) {
 
                 loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
-                domain ||= loaderInfo.applicationDomain;
                 _runnableClassName = ClassUtils.getFullyQualifiedName(runnable, true);
 
-                if (loaderInfo && domain) {
+                if (loaderInfo) {
 
-                    extraDependencies = reflect(domain, extraDependencies);
+                    extraDependencies = reflect(loaderInfo.applicationDomain, extraDependencies);
 
-                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies.toArray(), Capabilities.isDebugger);
+                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies.toArray(), giveAppPrivileges, Capabilities.isDebugger, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
 
                     _incomingChannel = _worker.createMessageChannel(Worker.current);

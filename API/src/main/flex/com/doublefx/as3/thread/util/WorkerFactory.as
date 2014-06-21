@@ -52,7 +52,7 @@ public class WorkerFactory {
      * @param domain the WorkerDomain to create the Worker in
      * @return the new Worker
      */
-    public static function getWorkerFromClass(bytes:ByteArray, clazz:Class, dependencies:Array, debug:Boolean = true, domain:WorkerDomain = null):Worker {
+    public static function getWorkerFromClass(bytes:ByteArray, clazz:Class, dependencies:Array, debug:Boolean = true, giveAppPrivileges:Boolean = false, domain:WorkerDomain = null):Worker {
         var swf:SWF = new SWF(bytes);
         var version:Number = swf.version;
         var compression:Boolean = swf.compressed;
@@ -142,7 +142,7 @@ public class WorkerFactory {
 
             if (!domain) domain = WorkerDomain.current;
 
-            return domain.createWorker(swfBytes);
+            return domain.createWorker(swfBytes, giveAppPrivileges);
         }
 
         return null;
