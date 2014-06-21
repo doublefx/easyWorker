@@ -49,11 +49,9 @@ use namespace thread_diagnostic;
 public class ThreadTestBase {
 
     public static var loaderInfo:LoaderInfo;
-    public static var currentDomain:ApplicationDomain;
 
     public function ThreadTestBase() {
         loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
-        currentDomain ||= LoaderInfo(FlexGlobals.topLevelApplication.loaderInfo).applicationDomain;
     }
 
     protected var _thread:IThread;
