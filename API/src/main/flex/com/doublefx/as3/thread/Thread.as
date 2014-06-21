@@ -74,6 +74,12 @@ import org.as3commons.reflect.Type;
 [Bindable]
 public final class Thread extends EventDispatcher implements IThread {
 
+    /**
+     * Minimum elapse time between each chained method.
+     * At time, FP/AIR is not able to compute all chained messages, giving a minimum elapse time between each chained method might help in this cases.
+     */
+    public static var commandInterval:uint = 0;
+
     private static var __internalDependencies:Vector.<ClassAlias>;
     private static var __internalAliasesToRegister:Vector.<ClassAlias>;
     private static var __count:uint;
@@ -250,7 +256,7 @@ public final class Thread extends EventDispatcher implements IThread {
             args.unshift(runnableClassName);
 
             if (_outgoingChannel && _outgoingChannel.state == MessageChannelState.OPEN)
-                _outgoingChannel.send(args);
+                setTimeout(function ():void{_outgoingChannel.send(args)}, commandInterval);
         }
     }
 
@@ -505,16 +511,15 @@ public final class Thread extends EventDispatcher implements IThread {
             registerClassAlias(classAlias.alias, classAlias.classObject);
         }
 
-        var args:Array = [_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliasesToRegister];
-
         if (_worker && _worker.state == WorkerState.RUNNING)
-            _outgoingChannel.send(args);
+            command(_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliasesToRegister);
         else
             callLater(function ():void {
-                if (_outgoingChannel && _outgoingChannel.state == MessageChannelState.OPEN) {
-                    _outgoingChannel.send(args);
-                    _workerReady = true;
-                }
+                const v:uint = commandInterval;
+                commandInterval = 0;
+                command(_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliasesToRegister);
+                commandInterval = v;
+                _workerReady = true;
             });
     }
 
