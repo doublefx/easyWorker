@@ -23,9 +23,9 @@
 package com.doublefx.as3.thread.util {
 import avmplus.getQualifiedClassName;
 
-import com.doublefx.as3.error.NotImplementedRunnableError;
 import com.doublefx.as3.thread.api.CrossThreadDispatcher;
 import com.doublefx.as3.thread.api.Runnable;
+import com.doublefx.as3.thread.error.NotImplementedRunnableError;
 import com.doublefx.as3.thread.event.ThreadActionRequestEvent;
 import com.doublefx.as3.thread.event.ThreadActionResponseEvent;
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
@@ -71,10 +71,6 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     }
 
     private function init():void {
-
-        registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
-        registerClassAlias("com.doublefx.as3.thread.util.Closure", Closure);
-        registerClassAlias("com.doublefx.as3.thread.util.DecodedMessage", DecodedMessage);
 
         if (!Worker.current.isPrimordial) {
             _incomingChannel = Worker.current.getSharedProperty(getQualifiedClassName(this) + "incoming") as MessageChannel;
@@ -243,20 +239,13 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
      *
      *  @see flash.net.registerClassAlias
      *
-     * @param aliases A vector of ClassAliases.
+     * @param Array of String, the class qualified name.
      */
-    protected function registerClassAliases(aliases:Vector.<ClassAlias>):void {
+    protected function registerClassAliases(aliases:Array):void {
 
-        for each (var classAlias:ClassAlias in aliases) {
-            try {
-                if (!classAlias.classObject)
-                    classAlias.classObject = getDefinitionByName(classAlias.alias) as Class;
-
-                registerClassAlias(classAlias.alias, classAlias.classObject);
-                //trace("ThreadRunner for " + getQualifiedClassName(_runnable) + ", is registering " + classAlias.alias + " to " + getQualifiedClassName(classAlias.classObject));
-            } catch (e:Error) {
-                //trace(e);
-            }
+        for each (var classAlias:String in aliases) {
+            var cls:Class = getDefinitionByName(classAlias) as Class;
+            registerClassAlias(classAlias, cls);
         }
     }
 

@@ -21,8 +21,8 @@
  * User: Frederic THOMAS Date: 13/06/2014 Time: 17:18
  */
 package com.doublefx.as3.thread {
-import com.doublefx.as3.error.NotImplementedRunnableError;
 import com.doublefx.as3.thread.api.IThread;
+import com.doublefx.as3.thread.error.NotImplementedRunnableError;
 import com.doublefx.as3.thread.event.ThreadActionRequestEvent;
 import com.doublefx.as3.thread.event.ThreadActionResponseEvent;
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
@@ -106,7 +106,6 @@ public final class Thread extends EventDispatcher implements IThread {
     {
         __internalDependencies = new Vector.<ClassAlias>();
 
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
         __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.util.Closure", Closure);
         __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.util.DecodedMessage", DecodedMessage);
         __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadFaultEvent", ThreadFaultEvent);
@@ -152,7 +151,8 @@ public final class Thread extends EventDispatcher implements IThread {
      *
      * @param runnable A class that implements Runnable.
      * @param name The name of the Thread.
-     * @param extraDependencies Some extra dependencies (class names) that can't be automatically discovered.
+     * @param extraDependencies Some extra dependencies that can't be automatically discovered.
+     * If you define a custom alias, do it using the RemoteClass tag, otherwise it will generate a TypeError: Error #1034
      * @param loaderInfo The loader info where the code of the Runnable stands.
      * @param domain The application domain on witch the Runnable is registered.
      */
@@ -162,8 +162,6 @@ public final class Thread extends EventDispatcher implements IThread {
             _name = name;
 
             if (runnable) {
-                registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
-                registerClassAlias("com.doublefx.as3.thread.util.DecodedMessage", DecodedMessage);
 
                 loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
                 domain ||= loaderInfo.applicationDomain;
@@ -494,16 +492,20 @@ public final class Thread extends EventDispatcher implements IThread {
      */
     private function registerClassAliases(aliases:Vector.<ClassAlias>):void {
 
+        const aliasesToRegister:Array = [];
+
         for each (var classAlias:ClassAlias in aliases) {
             if (StringUtils.isEmpty(classAlias.alias) && classAlias.classObject)
                 classAlias.alias = ClassUtils.getFullyQualifiedName(classAlias.classObject, true);
             else if (!classAlias.classObject && !StringUtils.isEmpty(classAlias.alias))
                 classAlias.classObject = getDefinitionByName(classAlias.alias) as Class;
 
+            aliasesToRegister[aliasesToRegister.length] = classAlias.alias;
+
             registerClassAlias(classAlias.alias, classAlias.classObject);
         }
 
-        var args:Array = [_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliases];
+        var args:Array = [_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliasesToRegister];
 
         if (_worker && _worker.state == WorkerState.RUNNING)
             _outgoingChannel.send(args);

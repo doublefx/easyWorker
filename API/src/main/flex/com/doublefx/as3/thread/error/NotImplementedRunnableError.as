@@ -20,7 +20,9 @@
 /**
  * User: Frederic THOMAS Date: 18/06/2014 Time: 13:42
  */
-package com.doublefx.as3.error {
+package com.doublefx.as3.thread.error {
+
+[RemoteClass(alias="com.doublefx.as3.thread.error.NotImplementedRunnableError")]
 public class NotImplementedRunnableError extends TypeError{
 
     public function NotImplementedRunnableError(runnableName:String) {
