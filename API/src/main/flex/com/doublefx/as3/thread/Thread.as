@@ -171,7 +171,7 @@ public final class Thread extends EventDispatcher implements IThread {
 
                     extraDependencies = reflect(loaderInfo.applicationDomain, extraDependencies);
 
-                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies.toArray(), giveAppPrivileges, Capabilities.isDebugger, workerDomain);
+                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies.toArray(), Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
 
                     _incomingChannel = _worker.createMessageChannel(Worker.current);

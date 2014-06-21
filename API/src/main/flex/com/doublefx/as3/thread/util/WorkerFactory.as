@@ -49,6 +49,7 @@ public class WorkerFactory {
      * @param bytes SWF ByteArray which must contain the Class definition (usually loaderInfo.bytes)
      * @param dependencies The clazz dependencies
      * @param debug set to tru if you want to debug the Worker
+     * @param giveAppPrivileges (default = false) — indicates whether the worker should be given application sandbox privileges in AIR. This parameter is ignored in Flash Player
      * @param domain the WorkerDomain to create the Worker in
      * @return the new Worker
      */
