@@ -4,7 +4,7 @@ easyWorker
 Flex / Air library to easily implement Workers.
 
 No more burden to create an other project and / or an extra SWF for your Worker,
-everything is in-memory, don't deal anymore with MessageChannel and other low level classes, use Thread an Events.
+everything is in-memory, don't deal anymore with MessageChannel and other low level API, use Thread an Events.
 
 Includes all the used classes and nothing more (except if you want to),
 register for you your typed object to pass them back and forth the Worker.
@@ -304,7 +304,7 @@ This project is compatible with Apache Flex SDK 4.13 which has not been released
 Why this minimum requirement ? Because from this version, debugging Workers is possible using FDB or any IDE which use it such as IntelliJ, because Flash Player 11.5 is the first version that allows you to use Worker, Condition and Mutex.
 
 Also, I use the very well done [as3-commons-reflect] [5] and [as3swf] [3] libs to reflect and emit the Worker and its dependencies in memory, FlexUnit 4.1 for the tests.
-Those libs can be found [here] [4]
+Those libs can be found [here] [4].
 
 This library is inspired by [worker-from-class] [6] and [Developer-friendly AS Workers API] [7]
 
