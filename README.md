@@ -9,7 +9,7 @@ everything is in-memory, don't deal anymore with MessageChannel and other low le
 Includes all the used classes and nothing more (except if you want to),
 register for you your typed object to pass them back and forth the Worker.
 
-[Download it] [8]
+[Download it] [8] (Deselect "Download with Sharebeast downloader" and click on the green Download button)
 
 How to use it ?
 ----
@@ -304,17 +304,17 @@ This project is compatible with Apache Flex SDK 4.13 which has not been released
 Why this minimum requirement ? Because from this version, debugging Workers is possible using FDB or any IDE which use it such as IntelliJ, because Flash Player 11.5 is the first version that allows you to use Worker, Condition and Mutex.
 
 Also, I use the very well done [as3-commons-reflect] [5] and [as3swf] [3] libs to reflect and emit the Worker and its dependencies in memory, FlexUnit 4.1 for the tests.
-Those libs and a compiled version of easyWorker can be found [here] [4] (careful to use the same Apache Flex Sdk as mentioned above).
+Those libs can be found [here] [4] (careful to use the same Apache Flex Sdk as mentioned above).
 
 This library is inspired by [worker-from-class] [6] and [Developer-friendly AS Workers API] [7]
 
 [1]:https://github.com/doublefx/easyWorker/issues
 [2]:http://flex.apache.org/installer.html
 [3]:https://github.com/claus/as3swf
-[4]:http://rapidshare.com/share/7C915CE60880FDE070C399702828B9DE
+[4]:http://www.sharebeast.com/759c4zz7d4sf
 [5]:http://www.as3commons.org/as3-commons-reflect/introduction.html
 [6]:https://github.com/bortsen/worker-from-class
 [7]:http://myappsnippet.com/developer-friendly-workers-api/
-[8]:http://rapidshare.com/share/C8135E40F71237646BD20179BEA14FFD
+[8]:http://www.sharebeast.com/bgxvynfft221
 
 Enjoy and don't hesitate to give me your feedback.
