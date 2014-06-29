@@ -73,8 +73,9 @@ public final class Thread extends EventDispatcher implements IThread {
     /**
      * The Default LoaderInfo used by all new created Thread when none is provided to its constructor.
      *
-     * For Flex / AIR, could be FlexGlobals.topLevelApplication.loaderInfo
-     * For Flash, could be stage.loaderInfo
+     * For Flex / AIR, the default is FlexGlobals.topLevelApplication.loaderInfo
+     * For Flash, there is no default, you need to provide the one containing this easyWorker library and your runnables,
+     * could be stage.loaderInfo for example if everything is compiled in the same application.
      */
     public static var DEFAULT_LOADER_INFO:LoaderInfo;
 
