@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="FlexDemo">
     <configurations>
-      <configuration name="FlexDemo" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/../out/production/FlexDemo" use-html-wrapper="true" wrapper-template-path="$MODULE_DIR$/html-template">
+      <configuration name="FlexDemo" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/../out/production/FlexDemo" wrapper-template-path="$MODULE_DIR$/html-template">
         <dependencies target-player="11.5">
           <entries>
             <entry module-name="API" build-configuration-name="easyWorker">
