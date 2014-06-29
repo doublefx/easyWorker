@@ -26,7 +26,6 @@
                applicationComplete="applicationCompleteHandler(event)">
     <fx:Script><![CDATA[
         import com.doublefx.as3.thread.Thread;
-        import com.doublefx.as3.thread.ThreadState;
         import com.doublefx.as3.thread.api.IThread;
         import com.doublefx.as3.thread.event.ThreadFaultEvent;
         import com.doublefx.as3.thread.event.ThreadProgressEvent;
@@ -34,6 +33,8 @@
         import com.doublefx.as3.thread.event.ThreadStateEvent;
 
         import mx.events.FlexEvent;
+        import mx.events.PropertyChangeEventKind;
+        import mx.events.PropertyChangeEventKind;
 
         import workers.ComplexWorker;
         import workers.vo.TermsVo;
@@ -41,7 +42,11 @@
         [Bindable]
         private var _thread:IThread;
 
+        PropertyChangeEventKind
+
         private function applicationCompleteHandler(event:FlexEvent):void {
+            Thread.DEFAULT_LOADER_INFO = loaderInfo;
+
             _thread = new Thread(ComplexWorker, "complexRunnable");
 
             _thread.addEventListener(ThreadStateEvent.THREAD_STATE, onThreadState);
