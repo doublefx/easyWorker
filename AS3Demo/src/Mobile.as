@@ -23,6 +23,8 @@
 package {
 import com.doublefx.as3.thread.Thread;
 
+import feathers.themes.MetalWorksMobileTheme;
+
 import flash.display.Loader;
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -40,9 +42,9 @@ import flash.utils.ByteArray;
 import starling.core.Starling;
 
 [SWF(width="960",height="640",frameRate="60",backgroundColor="#4a4137")]
-public class AIRDemo extends Sprite{
+public class Mobile extends Sprite{
 
-    public function AIRDemo()
+    public function Mobile()
     {
         if(this.stage)
         {
@@ -126,6 +128,7 @@ public class AIRDemo extends Sprite{
 
         Starling.handleLostContext = true;
         Starling.multitouchEnabled = true;
+        Main.themeClass = MetalWorksMobileTheme;
         this._starling = new Starling(Main, this.stage);
         this._starling.enableErrorChecking = false;
         this._starling.start();

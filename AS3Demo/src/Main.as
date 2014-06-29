@@ -31,7 +31,6 @@ import com.doublefx.as3.thread.event.ThreadStateEvent;
 import feathers.controls.Button;
 import feathers.controls.Check;
 import feathers.controls.Label;
-import feathers.themes.MetalWorksMobileTheme;
 
 import starling.display.Sprite;
 import starling.events.Event;
@@ -40,6 +39,8 @@ import workers.ComplexWorker;
 import workers.vo.TermsVo;
 
 public class Main extends Sprite {
+
+    public static var themeClass:Class;
 
     private var _result:Label;
 
@@ -66,7 +67,8 @@ public class Main extends Sprite {
     private function createChildren(event:Event = null):void {
         removeEventListener(Event.ADDED_TO_STAGE, createChildren);
 
-        new MetalWorksMobileTheme();
+        if (themeClass)
+            new themeClass();
 
         _result = new Label();
         _result.text = "Result: ";
@@ -75,13 +77,12 @@ public class Main extends Sprite {
 
         _isNewCheck = new Check();
         _isNewCheck.label = "NEW";
-        _isNewCheck.width = 150;
         _isNewCheck.y = _result.y + _result.height + 2;
         _isNewCheck.height = _result.height;
         _isNewCheck.isSelected = true;
         _isNewCheck.isEnabled = false;
         addChild(_isNewCheck);
-        _result.validate();
+        _isNewCheck.validate();
 
         _isRunningCheck = new Check();
         _isRunningCheck.label = "RUNNING";

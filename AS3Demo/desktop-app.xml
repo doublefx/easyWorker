@@ -22,7 +22,7 @@
 <!-- Adobe AIR Application Descriptor File Template.
      Specifies parameters for identifying, installing, and launching AIR applications.
 
-     xmlns - The Adobe AIR namespace: http://ns.adobe.com/air/application/3.5.
+     xmlns - The Adobe AIR namespace: http://ns.adobe.com/air/application/13.0.
      The last segment of the namespace specifies the version of the AIR runtime required for this application to run.
 
      minimumPatchLevel - The minimum patch level of the AIR runtime required to run the application. Optional. -->
@@ -31,13 +31,13 @@
 
     <!-- A universally unique application identifier. Must be unique across all AIR applications.
          Using a reverse DNS-style name as the id is recommended. (Eg. com.example.ExampleApplication.) Required. -->
-    <id>AIRDemo</id>
+    <id>AIRDemoDesktop</id>
 
     <!-- Used as the filename for the application. Required. -->
-    <filename>AIRDemo</filename>
+    <filename>AIRDemoDesktop</filename>
 
     <!-- The name that is displayed in the AIR application installer. May have multiple values for each language. See samples or xsd schema file. Optional. -->
-    <name>AIRDemo</name>
+    <name>AIRDemoDesktop</name>
 
     <!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade.
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
@@ -112,10 +112,10 @@
         <!--<aspectRatio></aspectRatio>-->
 
         <!-- Whether the app will begin auto-orienting on launch. Optional. Mobile only. Default false -->
-        <autoOrients>true</autoOrients>
+        <!--<autoOrients></autoOrients>-->
 
         <!-- Whether the app launches in full screen. Optional. Mobile only. Default false -->
-        <fullScreen>true</fullScreen>
+        <!--<fullScreen></fullScreen>-->
 
         <!-- The render mode for the app (either auto, cpu, gpu, or direct). Optional. Default auto -->
         <renderMode>direct</renderMode>
@@ -127,7 +127,7 @@
         <!--<softKeyboardBehavior></softKeyboardBehavior>-->
 
         <!-- Display Resolution for the app (either "standard" or "high"). Optional, OSX-only. Default "standard" -->
-        <requestedDisplayResolution>high</requestedDisplayResolution>
+        <!-- <requestedDisplayResolution></requestedDisplayResolution> -->
     </initialWindow>
 
     <!-- We recommend omitting the supportedProfiles element, which in turn permits your application to be deployed to all devices supported by AIR.
@@ -200,23 +200,23 @@
     <!--</fileTypes>-->
 
     <!-- iOS specific capabilities -->
-    <iPhone>
+    <!--<iPhone>-->
         <!-- A list of plist key/value pairs to be added to the application Info.plist -->
-        <InfoAdditions>
-            <![CDATA[
-            <key>UIDeviceFamily</key>
-            <array>
+        <!--<InfoAdditions>-->
+            <!--<![CDATA[-->
+            <!--<key>UIDeviceFamily</key>-->
+            <!--<array>-->
                 <!-- iPhone and iPod touch devices -->
-                <string>1</string>
+                <!--<string>1</string>-->
                 <!-- iPad devices -->
-                <string>2</string>
-            </array>
+                <!--<string>2</string>-->
+            <!--</array>-->
             <!--<key>UIStatusBarStyle</key>-->
             <!--<string>UIStatusBarStyleBlackOpaque</string>-->
             <!--<key>UIRequiresPersistentWiFi</key>-->
             <!--<string>YES</string>-->
-            ]]>
-        </InfoAdditions>
+            <!--]]>-->
+        <!--</InfoAdditions>-->
 
         <!-- A list of plist key/value pairs to be added to the application Entitlements.plist -->
         <!--<Entitlements>
@@ -230,27 +230,27 @@
         </Entitlements>-->
 
         <!-- Display Resolution for the app (either "standard" or "high"). Optional. Default "standard" -->
-        <requestedDisplayResolution>high</requestedDisplayResolution>
+        <!--<requestedDisplayResolution>high</requestedDisplayResolution>-->
         <!-- Forcing Render Mode CPU for the devices mentioned. Optional  -->
         <!--<forceCPURenderModeForDevices></forceCPURenderModeForDevices> -->
         <!-- File containing line separated list of external swf paths. These swfs won't be packaged inside the application
         and corresponding stripped swfs will be output in externalStrippedSwfs folder. -->
         <!--<externalSwfs></externalSwfs> -->
-    </iPhone>
+    <!--</iPhone>-->
 
     <!-- Android specific tags that get passed to AndroidManifest.xml file. -->
-    <android>
-        <manifestAdditions>
-            <![CDATA[
-            <manifest android:installLocation="auto">
-                <uses-permission android:name="android.permission.INTERNET"/>
-                <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!--<android>-->
+        <!--<manifestAdditions>-->
+            <!--<![CDATA[-->
+            <!--<manifest android:installLocation="auto">-->
+                <!--<uses-permission android:name="android.permission.INTERNET"/>-->
+                <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
                 <!--<uses-permission android:name="android.permission.READ_PHONE_STATE"/>-->
                 <!--<uses-permission android:name="android.permission.VIBRATE"/>-->
-                <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+                <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>-->
                 <!--<uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>-->
                 <!--<uses-permission android:name="android.permission.WAKE_LOCK"/>-->
-                <uses-permission android:name="android.permission.CAMERA"/>
+                <!--<uses-permission android:name="android.permission.CAMERA"/>-->
                 <!--<uses-permission android:name="android.permission.RECORD_AUDIO"/>-->
                 <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>-->
                 <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>-->
@@ -264,14 +264,14 @@
                         </intent-filter>
                     </activity>
                 </application>-->
-            </manifest>
-            ]]>
-            </manifestAdditions>
+            <!--</manifest>-->
+            <!--]]>-->
+            <!--</manifestAdditions>-->
 
         <!-- Color depth for the app (either "32bit" or "16bit"). Optional. Default 16bit before namespace 3.0, 32bit after -->
         <!--<colorDepth></colorDepth>-->
         <!-- Indicates if the app contains video or not. Necessary for ordering of video planes with graphics plane, especially in Jellybean - if you app does video this must be set to true - valid values are true or false -->
         <!-- <containsVideo></containsVideo> -->
-    </android>
+    <!--</android>-->
 
 </application>

@@ -71,7 +71,7 @@ import org.as3commons.reflect.Type;
 public final class Thread extends EventDispatcher implements IThread {
 
     /**
-     * The Default LoaderInfo used by all new created Thread when none is provided to its constructor.
+     * The Default LoaderInfo used by all new created Threads when none is provided to its constructor.
      *
      * For Flex / AIR, the default is FlexGlobals.topLevelApplication.loaderInfo
      * For Flash, there is no default, you need to provide the one containing this easyWorker library and your runnables,
