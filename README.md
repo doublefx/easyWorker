@@ -10,6 +10,7 @@ Includes all the used classes and nothing more (except if you want to),
 register for you your typed object to pass them back and forth the Worker.
 
 [Download it] [8] (Deselect "Download with Sharebeast downloader" and click on the green Download button)
+The PureAS3 version can be found [here] [9]
 
 How to use it ?
 ----
@@ -284,8 +285,6 @@ The IThread interface looks like that:
       */
      function get isTerminating():Boolean;
  }
- state():String;
- }
 ```
 
 Note: This is an early stage version, many things have to come:
@@ -316,5 +315,6 @@ This library is inspired by [worker-from-class] [6] and [Developer-friendly AS W
 [6]:https://github.com/bortsen/worker-from-class
 [7]:http://myappsnippet.com/developer-friendly-workers-api/
 [8]:http://www.sharebeast.com/bgxvynfft221
+[9]:https://github.com/doublefx/easyWorker/tree/PureAS3
 
 Enjoy and don't hesitate to give me your feedback.
