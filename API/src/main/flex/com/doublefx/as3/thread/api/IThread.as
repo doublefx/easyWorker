@@ -21,8 +21,6 @@
  * User: Frederic THOMAS Date: 15/06/2014 Time: 16:35
  */
 package com.doublefx.as3.thread.api {
-import com.doublefx.as3.thread.util.ClassAlias;
-
 import flash.events.IEventDispatcher;
 
 /**

@@ -56,7 +56,6 @@ import flash.utils.getDefinitionByName;
 import flash.utils.getQualifiedClassName;
 import flash.utils.setTimeout;
 
-import mx.collections.ArrayList;
 import mx.core.FlexGlobals;
 
 import org.as3commons.lang.ClassUtils;
@@ -73,6 +72,15 @@ import org.as3commons.reflect.Type;
  */
 [Bindable]
 public final class Thread extends EventDispatcher implements IThread {
+
+    /**
+     * The Default LoaderInfo used by all new created Thread when none is provided to its constructor.
+     *
+     * For Flex / AIR, the default is FlexGlobals.topLevelApplication.loaderInfo
+     * For Flash, there is no default, you need to provide the one containing this easyWorker library and your runnables,
+     * could be stage.loaderInfo for example if everything is compiled in the same application.
+     */
+    public static var DEFAULT_LOADER_INFO:LoaderInfo = FlexGlobals.topLevelApplication.loaderInfo;
 
     /**
      * Minimum elapse time between each chained method.
@@ -94,7 +102,7 @@ public final class Thread extends EventDispatcher implements IThread {
 
     private var _callLater:Array;
 
-    private var _dependencies:ArrayList;
+    private var _dependencies:Array;
     private var _workerReady:Boolean;
 
     private var _isNew:Boolean = true;
@@ -170,14 +178,14 @@ public final class Thread extends EventDispatcher implements IThread {
 
             if (runnable) {
 
-                loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
+                loaderInfo ||= DEFAULT_LOADER_INFO;
                 _runnableClassName = ClassUtils.getFullyQualifiedName(runnable, true);
 
                 if (loaderInfo) {
 
                     extraDependencies = reflect(loaderInfo.applicationDomain, extraDependencies);
 
-                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies.toArray(), Capabilities.isDebugger, giveAppPrivileges, workerDomain);
+                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
 
                     _incomingChannel = _worker.createMessageChannel(Worker.current);
@@ -205,10 +213,10 @@ public final class Thread extends EventDispatcher implements IThread {
         _dependencies = ThreadDependencyHelper.collectDependencies(threadRunnerType);
 
         const runnableType:Type = Type.forName(_runnableClassName, domain);
-        const runnableDependencies:ArrayList = ThreadDependencyHelper.collectDependencies(runnableType);
+        const runnableDependencies:Array = ThreadDependencyHelper.collectDependencies(runnableType);
 
         if (_dependencies.length > 0)
-            _dependencies.removeItemAt(0);
+            _dependencies.shift();
 
         if (__internalDependencies && __internalDependencies.length > 0)
             for each (classAlias in __internalDependencies) {
@@ -216,7 +224,7 @@ public final class Thread extends EventDispatcher implements IThread {
             }
 
         if (runnableDependencies.length > 0)
-            for each (var className:String in runnableDependencies.toArray()) {
+            for each (var className:String in runnableDependencies) {
                 className = ClassUtils.convertFullyQualifiedName(className);
                 ThreadDependencyHelper.addUniquely(className, _dependencies);
                 if (className != _runnableClassName && className.indexOf("com.doublefx.as3.thread.") != 0) {
@@ -371,7 +379,7 @@ public final class Thread extends EventDispatcher implements IThread {
         return _runnableClassName;
     }
 
-    thread_diagnostic function get dependencies():ArrayList {
+    thread_diagnostic function get dependencies():Array {
         return _dependencies;
     }
 

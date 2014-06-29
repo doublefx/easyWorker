@@ -23,10 +23,7 @@
 package com.doublefx.as3.thread.util {
 import flash.utils.Dictionary;
 
-import mx.collections.ArrayList;
-
 import org.as3commons.lang.ClassUtils;
-
 import org.as3commons.lang.StringUtils;
 import org.as3commons.reflect.Constructor;
 import org.as3commons.reflect.IMember;
@@ -81,9 +78,9 @@ public class ThreadDependencyHelper {
     // END: Copied from org.as3commons.bytecode.reflect.ByteCodeType
 
 
-    public static function collectDependencies(codeType:Type, returnArray:ArrayList = null):ArrayList {
+    public static function collectDependencies(codeType:Type, returnArray:Array = null):Array {
         if (!returnArray)
-            returnArray = new ArrayList();
+            returnArray = [];
 
         if (codeType && isValidTypeName(codeType.fullName)) {
 
@@ -160,7 +157,7 @@ public class ThreadDependencyHelper {
         return returnArray;
     }
 
-    private static function collectMembers(member:IMember, returnArray:ArrayList):void {
+    private static function collectMembers(member:IMember, returnArray:Array):void {
         const memberType:Type = member.type;
         if (memberType && isValidTypeName(memberType.fullName)) {
             collectDependencies(Type.forName(memberType.fullName, memberType.applicationDomain), returnArray);
@@ -174,12 +171,28 @@ public class ThreadDependencyHelper {
         return (!isNativeName(typeName));
     }
 
-    public static function addUniquely(item:Object, array:ArrayList):Boolean {
-        if (item != null && array.getItemIndex(item) == -1) {
-            array.addItem(item);
+    public static function addUniquely(item:Object, array:Array):Boolean {
+        if (item != null && getItemIndex(array, item) == -1) {
+            array[array.length] = item;
             return true;
         }
         return false;
+    }
+
+    private static function getItemIndex(array:Array, item:*):int {
+        var index:int = -1;
+
+        if (array) {
+            for (var i:uint = 0; i < array.length; i++) {
+                var anItem:* = array [i];
+                if (anItem == item) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+
+        return index;
     }
 
 }
