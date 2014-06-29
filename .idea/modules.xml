@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/API/API.iml" filepath="$PROJECT_DIR$/API/API.iml" />
-      <module fileurl="file://$PROJECT_DIR$/AS3Demo/AS3Demo.iml" filepath="$PROJECT_DIR$/AS3Demo/AS3Demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/FlexDemo/FlexDemo.iml" filepath="$PROJECT_DIR$/FlexDemo/FlexDemo.iml" />
     </modules>
   </component>
