@@ -56,9 +56,6 @@ import flash.utils.getDefinitionByName;
 import flash.utils.getQualifiedClassName;
 import flash.utils.setTimeout;
 
-import mx.collections.ArrayList;
-import mx.core.FlexGlobals;
-
 import org.as3commons.lang.ClassUtils;
 import org.as3commons.lang.StringUtils;
 import org.as3commons.reflect.Type;
@@ -71,8 +68,15 @@ import org.as3commons.reflect.Type;
 /**
  * Create and Manage a Worker for a given Runnable.
  */
-[Bindable]
 public final class Thread extends EventDispatcher implements IThread {
+
+    /**
+     * The Default LoaderInfo used by all new created Thread when none is provided to its constructor.
+     *
+     * For Flex / AIR, could be FlexGlobals.topLevelApplication.loaderInfo
+     * For Flash, could be stage.loaderInfo
+     */
+    public static var DEFAULT_LOADER_INFO:LoaderInfo;
 
     /**
      * Minimum elapse time between each chained method.
@@ -94,7 +98,7 @@ public final class Thread extends EventDispatcher implements IThread {
 
     private var _callLater:Array;
 
-    private var _dependencies:ArrayList;
+    private var _dependencies:Array;
     private var _workerReady:Boolean;
 
     private var _isNew:Boolean = true;
@@ -170,14 +174,14 @@ public final class Thread extends EventDispatcher implements IThread {
 
             if (runnable) {
 
-                loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
+                loaderInfo ||= DEFAULT_LOADER_INFO;
                 _runnableClassName = ClassUtils.getFullyQualifiedName(runnable, true);
 
                 if (loaderInfo) {
 
                     extraDependencies = reflect(loaderInfo.applicationDomain, extraDependencies);
 
-                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies.toArray(), Capabilities.isDebugger, giveAppPrivileges, workerDomain);
+                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
 
                     _incomingChannel = _worker.createMessageChannel(Worker.current);
@@ -205,10 +209,10 @@ public final class Thread extends EventDispatcher implements IThread {
         _dependencies = ThreadDependencyHelper.collectDependencies(threadRunnerType);
 
         const runnableType:Type = Type.forName(_runnableClassName, domain);
-        const runnableDependencies:ArrayList = ThreadDependencyHelper.collectDependencies(runnableType);
+        const runnableDependencies:Array = ThreadDependencyHelper.collectDependencies(runnableType);
 
         if (_dependencies.length > 0)
-            _dependencies.removeItemAt(0);
+            _dependencies.shift();
 
         if (__internalDependencies && __internalDependencies.length > 0)
             for each (classAlias in __internalDependencies) {
@@ -216,7 +220,7 @@ public final class Thread extends EventDispatcher implements IThread {
             }
 
         if (runnableDependencies.length > 0)
-            for each (var className:String in runnableDependencies.toArray()) {
+            for each (var className:String in runnableDependencies) {
                 className = ClassUtils.convertFullyQualifiedName(className);
                 ThreadDependencyHelper.addUniquely(className, _dependencies);
                 if (className != _runnableClassName && className.indexOf("com.doublefx.as3.thread.") != 0) {
@@ -256,7 +260,9 @@ public final class Thread extends EventDispatcher implements IThread {
             args.unshift(runnableClassName);
 
             if (_outgoingChannel && _outgoingChannel.state == MessageChannelState.OPEN)
-                setTimeout(function ():void{_outgoingChannel.send(args)}, commandInterval);
+                setTimeout(function ():void {
+                    _outgoingChannel.send(args)
+                }, commandInterval);
         }
     }
 
@@ -371,7 +377,7 @@ public final class Thread extends EventDispatcher implements IThread {
         return _runnableClassName;
     }
 
-    thread_diagnostic function get dependencies():ArrayList {
+    thread_diagnostic function get dependencies():Array {
         return _dependencies;
     }
 
@@ -393,16 +399,16 @@ public final class Thread extends EventDispatcher implements IThread {
 
         switch (worker.state) {
             case WorkerState.RUNNING:
-                isNew = false;
-                isRunning = true;
+                _isNew = false;
+                _isRunning = true;
                 _isStarting = false;
                 _currentState = ThreadState.RUNNING;
                 break;
             case WorkerState.TERMINATED:
                 trace("Thread onWorkerState: TERMINATED");
-                isRunning = isPaused = false;
+                _isRunning = _isPaused = false;
                 _isTerminating = false;
-                isTerminated = true;
+                _isTerminated = true;
                 destroyWorker();
                 _currentState = ThreadState.TERMINATED;
                 break;
@@ -429,23 +435,23 @@ public final class Thread extends EventDispatcher implements IThread {
             const response:ThreadActionResponseEvent = event as ThreadActionResponseEvent;
             switch (response.type) {
                 case ThreadActionResponseEvent.PAUSED:
-                    isRunning = false;
-                    isPaused = true;
+                    _isRunning = false;
+                    _isPaused = true;
                     _isPausing = false;
                     _currentState = ThreadState.PAUSED;
                     event = new ThreadStateEvent(ThreadState.PAUSED);
                     break;
                 case ThreadActionResponseEvent.RESUMED:
-                    isRunning = true;
-                    isPaused = false;
+                    _isRunning = true;
+                    _isPaused = false;
                     _isResuming = false;
                     _currentState = ThreadState.RESUMED;
                     event = new ThreadStateEvent(ThreadState.RESUMED);
                     break;
                 case ThreadActionResponseEvent.TERMINATED:
-                    isRunning = false;
-                    isPaused = false;
-                    isTerminated = true;
+                    _isRunning = false;
+                    _isPaused = false;
+                    _isTerminated = true;
                     terminateWorker();
                     break;
                 default:
@@ -542,34 +548,6 @@ public final class Thread extends EventDispatcher implements IThread {
     private function onError(error:Error):void {
         const event:ThreadFaultEvent = new ThreadFaultEvent(error);
         dispatchEvent(event);
-    }
-
-    /**
-     * Here for convenient binding, don't try to set it.
-     */
-    private function set isNew(value:Boolean):void {
-        _isNew = value;
-    }
-
-    /**
-     * Here for convenient binding, don't try to set it.
-     */
-    private function set isRunning(value:Boolean):void {
-        _isRunning = value;
-    }
-
-    /**
-     * Here for convenient binding, don't try to set it.
-     */
-    private function set isPaused(value:Boolean):void {
-        _isPaused = value;
-    }
-
-    /**
-     * Here for convenient binding, don't try to set it.
-     */
-    private function set isTerminated(value:Boolean):void {
-        _isTerminated = value;
     }
 }
 }

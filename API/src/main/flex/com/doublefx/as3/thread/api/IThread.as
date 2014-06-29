@@ -21,15 +21,12 @@
  * User: Frederic THOMAS Date: 15/06/2014 Time: 16:35
  */
 package com.doublefx.as3.thread.api {
-import com.doublefx.as3.thread.util.ClassAlias;
-
 import flash.events.IEventDispatcher;
 
 /**
  * All we need to play with the Thread class.
  */
-[Bindable]
-public interface IThread extends IEventDispatcher{
+public interface IThread extends IEventDispatcher {
 
     /**
      * Start a Thread and call the Runnable's run method.
