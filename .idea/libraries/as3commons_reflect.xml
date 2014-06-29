@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="as3commons-reflect" type="flex">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/API/lib/as3commons-lang" />
+      <root url="file://$PROJECT_DIR$/API/lib/as3commons-reflect" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/API/lib/as3commons-reflect/as3commons-reflect-1.6.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/API/lib/as3commons-lang/as3commons-lang-0.3.6-sources.jar!/" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/API/lib/as3commons-lang" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/API/lib/as3commons-reflect" recursive="false" />
+  </library>
+</component>
