@@ -172,28 +172,11 @@ public class ThreadDependencyHelper {
     }
 
     public static function addUniquely(item:Object, array:Array):Boolean {
-        if (item != null && getItemIndex(array, item) == -1) {
+        if (item != null && array.indexOf(item) == -1) {
             array[array.length] = item;
             return true;
         }
         return false;
     }
-
-    private static function getItemIndex(array:Array, item:*):int {
-        var index:int = -1;
-
-        if (array) {
-            for (var i:uint = 0; i < array.length; i++) {
-                var anItem:* = array [i];
-                if (anItem == item) {
-                    index = i;
-                    break;
-                }
-            }
-        }
-
-        return index;
-    }
-
 }
 }
