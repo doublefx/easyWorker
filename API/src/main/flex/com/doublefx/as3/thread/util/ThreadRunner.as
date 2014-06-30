@@ -257,12 +257,10 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     }
 
     public function dispatchError(error:Error):void {
-        trace("ThreadRunner dispatchError: " + error.message);
         _outgoingChannel.send(new ThreadFaultEvent(error));
     }
 
     public function dispatchResult(result:*):void {
-        trace("ThreadRunner dispatchResult: " + result);
         _outgoingChannel.send(new ThreadResultEvent(result));
     }
 }
