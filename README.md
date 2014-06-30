@@ -9,7 +9,7 @@ everything is in-memory, don't deal anymore with MessageChannel and other low le
 Includes all the used classes and nothing more (except if you want to),
 register for you your typed object to pass them back and forth the Worker.
 
-[Download it] [8] (Deselect "Download with Sharebeast downloader" and click on the green Download button)
+[Download easyWorkerAS3.swc] [8] (Deselect "Download with Sharebeast downloader" and click on the green Download button)
 The Flex / AIR version can be found [here] [9]
 
 How to use it ?
@@ -53,7 +53,7 @@ This library is inspired by [worker-from-class] [6] and [Developer-friendly AS W
 [5]:http://www.as3commons.org/as3-commons-reflect/introduction.html
 [6]:https://github.com/bortsen/worker-from-class
 [7]:http://myappsnippet.com/developer-friendly-workers-api/
-[8]:http://www.sharebeast.com/ivepct35axem
+[8]:http://www.sharebeast.com/9q0s9ahr5jne
 [9]:https://github.com/doublefx/easyWorker
 [10]:http://www.sharebeast.com/yhxzr2jbkem0
 
