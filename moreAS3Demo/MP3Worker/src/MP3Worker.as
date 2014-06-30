@@ -33,9 +33,7 @@ public class MP3Worker extends DebuggableWorker {
 
         Thread.DEFAULT_LOADER_INFO = loaderInfo;
 
-        const aliases:Vector.<ClassAlias> = new Vector.<ClassAlias>();
-        aliases[aliases.length] = new ClassAlias("fr.kikko.lab.ShineMP3Encoder", ShineMP3Encoder);
-        aliases[aliases.length] = new ClassAlias("cmodule.shine.*");
+        const aliases:Vector.<String> = Vector.<String>(["fr.kikko.lab.ShineMP3Encoder", "cmodule.shine.*"]);
 
         _thread = new Thread(BackWorker, "backWorker", false, aliases);
 
