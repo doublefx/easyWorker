@@ -50,7 +50,7 @@ import mx.core.DebuggableWorker;
  * This instance will be pass to the Runnable public var dispatcher:CrossThreadDispatcher
  * in order to delegate the sending of the events to the caller Thread.
  */
-[Exclude]
+[ExcludeClass]
 public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatcher {
 
     private static const DISPATCHER_PROPERTY:String = "dispatcher";
@@ -73,6 +73,8 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     private function init():void {
 
         if (!Worker.current.isPrimordial) {
+            registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
+
             _incomingChannel = Worker.current.getSharedProperty(getQualifiedClassName(this) + "incoming") as MessageChannel;
             _outgoingChannel = Worker.current.getSharedProperty(getQualifiedClassName(this) + "outgoing") as MessageChannel;
 
@@ -242,10 +244,16 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
      * @param Array of String, the class qualified name.
      */
     protected function registerClassAliases(aliases:Array):void {
+        var item:Array;
 
-        for each (var classAlias:String in aliases) {
-            var cls:Class = getDefinitionByName(classAlias) as Class;
-            registerClassAlias(classAlias, cls);
+        for each (item in aliases) {
+            var classAlias:ClassAlias = new ClassAlias(item[0], item[1]);
+            try {
+                var cls:Class = getDefinitionByName(classAlias.fullyQualifiedName) as Class;
+                registerClassAlias(classAlias.alias, cls);
+            } catch (e:Error) {
+                trace("ThreadRunner registerClassAliases Error: " + e.message);
+            }
         }
     }
 

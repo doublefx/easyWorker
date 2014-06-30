@@ -27,6 +27,7 @@ import org.as3commons.lang.ClassUtils;
 import org.as3commons.lang.StringUtils;
 import org.as3commons.reflect.Constructor;
 import org.as3commons.reflect.IMember;
+import org.as3commons.reflect.Metadata;
 import org.as3commons.reflect.Method;
 import org.as3commons.reflect.Parameter;
 import org.as3commons.reflect.Type;
@@ -34,7 +35,7 @@ import org.as3commons.reflect.as3commons_reflect;
 
 use namespace as3commons_reflect;
 
-[Exclude]
+[ExcludeClass]
 public class ThreadDependencyHelper {
 
     // START: Copied from org.as3commons.bytecode.reflect.ByteCodeType
@@ -155,6 +156,25 @@ public class ThreadDependencyHelper {
             }
         }
         return returnArray;
+    }
+
+    public static function collectAliases(dependency:Type):ClassAlias {
+
+        if (dependency.metadata)
+            for each (var metadata:Metadata in dependency.metadata) {
+                if (metadata.name == "remoteclass") {
+                    var fullyQualifiedName:String = ClassUtils.convertFullyQualifiedName(dependency.fullName);
+                    var alias:String;
+                    if (metadata.hasArgumentWithKey("alias"))
+                        alias = metadata.getArgument("alias").value;
+                    else
+                        alias = fullyQualifiedName;
+
+                    return new ClassAlias(fullyQualifiedName, alias);
+                }
+            }
+
+        return null;
     }
 
     private static function collectMembers(member:IMember, returnArray:Array):void {

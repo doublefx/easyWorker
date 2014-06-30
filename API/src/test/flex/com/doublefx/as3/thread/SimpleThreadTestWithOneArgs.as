@@ -48,7 +48,7 @@ public class SimpleThreadTestWithOneArgs extends SimpleThreadTestWithNoArgs {
     override public function testDependenciesContent():void {
         const dependencies:Array = ["mx.core.DebuggableWorker","com.doublefx.as3.thread.api.CrossThreadDispatcher","com.doublefx.as3.thread.util.Closure","com.doublefx.as3.thread.util.DecodedMessage","com.doublefx.as3.thread.event.ThreadFaultEvent","com.doublefx.as3.thread.event.ThreadResultEvent","com.doublefx.as3.thread.event.ThreadProgressEvent","com.doublefx.as3.thread.event.ThreadActionRequestEvent","com.doublefx.as3.thread.event.ThreadActionResponseEvent","com.doublefx.as3.thread.error.NotImplementedRunnableError","workers.SimpleWorkerWithOneArg","com.doublefx.as3.thread.api.Runnable"];
 
-        assertThat(Thread(_thread).dependencies.toArray(), arrayExact(dependencies));
+        assertThat(Thread(_thread).collectedDependencies.toArray(), arrayExact(dependencies));
     }
 
     [Test(description="Verify the Runnable class name")]

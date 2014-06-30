@@ -89,7 +89,7 @@ public class ThreadTestBase {
 
     [Test (description="Verify dependencies")]
     public function testDependenciesExistence():void {
-        assertNull("Should be null" ,Thread(_thread).dependencies);
+        assertNull("Should be null" ,Thread(_thread).collectedDependencies);
     }
 
     [Test (description="Verify the Runnable class name")]

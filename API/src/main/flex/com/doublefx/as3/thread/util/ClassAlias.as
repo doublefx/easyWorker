@@ -22,14 +22,14 @@
  */
 package com.doublefx.as3.thread.util {
 
-[RemoteClass(alias="com.doublefx.as3.thread.util.ClassAlias")]
+[ExcludeClass]
 public class ClassAlias {
+    public var fullyQualifiedName:String;
     public var alias:String;
-    public var classObject:Class;
 
-    public function ClassAlias(alias:String = null, classObject:Class = null):void {
+    public function ClassAlias(fullyQualifiedName:String, alias:String = null):void {
+        this.fullyQualifiedName = fullyQualifiedName;
         this.alias = alias;
-        this.classObject = classObject;
     }
 }
 }
