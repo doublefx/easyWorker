@@ -180,7 +180,12 @@ public final class Thread extends EventDispatcher implements IThread {
 
                 if (loaderInfo) {
 
+                    extraDependencies = extractClassesFromPackages(loaderInfo.applicationDomain, extraDependencies);
                     extraDependencies = reflect(loaderInfo.applicationDomain, extraDependencies);
+
+                    for each (var classAlias:ClassAlias in extraDependencies) {
+                        _dependencies[_dependencies.length] = ClassUtils.convertFullyQualifiedName(classAlias.alias);
+                    }
 
                     _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
@@ -200,6 +205,30 @@ public final class Thread extends EventDispatcher implements IThread {
         } else {
             throw new Error("Concurrent workers not supported by this platform");
         }
+    }
+
+    private static function extractClassesFromPackages(applicationDomain:ApplicationDomain, extraDependencies:Vector.<ClassAlias>):Vector.<ClassAlias> {
+        const more:Array = [];
+        for (var i:uint = 0; i < extraDependencies.length; i++) {
+            const alias:ClassAlias = extraDependencies[i];
+            if (StringUtils.endsWith(alias.alias, ".*")) {
+                extraDependencies.splice(i, 1);
+                const packageBase:String = alias.alias.substr(0, alias.alias.indexOf(".*")) + ":";
+                const definitionNames:Vector.<String> = applicationDomain.getQualifiedDefinitionNames();
+                for each (var definitionName:String in definitionNames) {
+                    if (StringUtils.startsWith(definitionName, packageBase)) {
+                        more[more.length] = definitionName;
+                    }
+                }
+            }
+        }
+
+        if (more.length > 0)
+            for each (var definition:String in more) {
+                extraDependencies[extraDependencies.length] = new ClassAlias(definition);
+            }
+
+        return extraDependencies;
     }
 
     private function reflect(domain:ApplicationDomain, extraDependencies:Vector.<ClassAlias>):Vector.<ClassAlias> {
@@ -510,12 +539,19 @@ public final class Thread extends EventDispatcher implements IThread {
         for each (var classAlias:ClassAlias in aliases) {
             if (StringUtils.isEmpty(classAlias.alias) && classAlias.classObject)
                 classAlias.alias = ClassUtils.getFullyQualifiedName(classAlias.classObject, true);
-            else if (!classAlias.classObject && !StringUtils.isEmpty(classAlias.alias))
-                classAlias.classObject = getDefinitionByName(classAlias.alias) as Class;
+            else if (!classAlias.classObject && !StringUtils.isEmpty(classAlias.alias)) {
+                try {
+                    classAlias.classObject = getDefinitionByName(classAlias.alias) as Class;
+                } catch (e:ReferenceError) {
+                    continue;
+                }
+            }
 
-            aliasesToRegister[aliasesToRegister.length] = classAlias.alias;
+            if (classAlias.classObject) {
+                aliasesToRegister[aliasesToRegister.length] = classAlias.alias;
 
-            registerClassAlias(classAlias.alias, classAlias.classObject);
+                registerClassAlias(classAlias.alias, classAlias.classObject);
+            }
         }
 
         if (_worker && _worker.state == WorkerState.RUNNING)
