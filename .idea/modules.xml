@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/API/API.iml" filepath="$PROJECT_DIR$/API/API.iml" />
       <module fileurl="file://$PROJECT_DIR$/AS3Demo/AS3Demo.iml" filepath="$PROJECT_DIR$/AS3Demo/AS3Demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moreAS3Demo/MP3Worker/MP3Worker.iml" filepath="$PROJECT_DIR$/moreAS3Demo/MP3Worker/MP3Worker.iml" />
     </modules>
   </component>
 </project>
