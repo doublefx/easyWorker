@@ -115,11 +115,10 @@ Now, to use your Runnable inside a Thread.
 
 The Constructor of the Thread allows you to pass extra dependencies in case they are not
 automatically detected, those dependencies will be added to you worker and registered as aliases
-allowing you to pass them back and forth the Thread:
+if they contain the [RemoteClass] tag allowing you to pass them back and forth the Thread:
 
 ```ActionScript
-const extraDependencies:Vector.<ClassAlias> = new Vector.<ClassAlias>();
-extraDependencies[0] = new ClassAlias("workers.vo.TermsVo", TermsVo);
+const extraDependencies:Vector.<String> = Vector.<String>(["workers.vo.TermsVo"]);
 
 _thread = new Thread(ComplexWorker, "nameOfMyThread", false, extraDependencies, loaderInfo, workerDomain);
 ```
@@ -314,7 +313,7 @@ This library is inspired by [worker-from-class] [6] and [Developer-friendly AS W
 [5]:http://www.as3commons.org/as3-commons-reflect/introduction.html
 [6]:https://github.com/bortsen/worker-from-class
 [7]:http://myappsnippet.com/developer-friendly-workers-api/
-[8]:http://www.sharebeast.com/de4x083d9nvd
+[8]:http://www.sharebeast.com/t1li0xk2w5f3
 [9]:https://github.com/doublefx/easyWorker/tree/PureAS3
 
 Enjoy and don't hesitate to give me your feedback.
