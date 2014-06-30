@@ -6,7 +6,7 @@ Thread based implementation of the [original MP3Worker] [1].
 It runs a WAV->MP3 converter in a Thread.
 It uses those [libraries] [2]
 
-![ScreenShot](https://raw.github.com/doublefx/easyWorker/tree/PureAS3/moreAS3Demo/MP3Worker/MP3Worker.JPG)
+![ScreenShot](https://raw.githubusercontent.com/doublefx/easyWorker/PureAS3/moreAS3Demo/MP3Worker/MP3Worker.JPG)
 
 Enjoy and don't hesitate to give me your feedback.
 
