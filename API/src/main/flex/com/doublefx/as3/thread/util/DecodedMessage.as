@@ -22,7 +22,7 @@
  */
 package com.doublefx.as3.thread.util {
 
-[RemoteClass(alias="com.doublefx.as3.thread.util.DecodedMessage")]
+[ExcludeClass]
 public class DecodedMessage {
     public var runnableClassName:String;
     public var functionName:String;

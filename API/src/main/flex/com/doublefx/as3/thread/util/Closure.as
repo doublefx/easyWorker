@@ -21,6 +21,7 @@
  * User: Frederic THOMAS Date: 20/06/2014 Time: 15:07
  */
 package com.doublefx.as3.thread.util {
+[ExcludeClass]
 public class Closure {
 
     public static function create(context:Object, func:Function, ...pms):Function {

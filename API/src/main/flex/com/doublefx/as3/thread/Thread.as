@@ -22,8 +22,6 @@
  */
 package com.doublefx.as3.thread {
 import com.doublefx.as3.thread.api.IThread;
-import com.doublefx.as3.thread.error.NotImplementedRunnableError;
-import com.doublefx.as3.thread.event.ThreadActionRequestEvent;
 import com.doublefx.as3.thread.event.ThreadActionResponseEvent;
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
 import com.doublefx.as3.thread.event.ThreadProgressEvent;
@@ -31,17 +29,11 @@ import com.doublefx.as3.thread.event.ThreadResultEvent;
 import com.doublefx.as3.thread.event.ThreadStateEvent;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;
 import com.doublefx.as3.thread.util.ClassAlias;
-import com.doublefx.as3.thread.util.Closure;
-import com.doublefx.as3.thread.util.DecodedMessage;
 import com.doublefx.as3.thread.util.ThreadDependencyHelper;
 import com.doublefx.as3.thread.util.ThreadRunner;
 import com.doublefx.as3.thread.util.WorkerFactory;
 
 import flash.display.LoaderInfo;
-import flash.errors.EOFError;
-import flash.errors.IOError;
-import flash.errors.IllegalOperationError;
-import flash.errors.MemoryError;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 import flash.net.registerClassAlias;
@@ -88,7 +80,7 @@ public final class Thread extends EventDispatcher implements IThread {
      */
     public static var commandInterval:uint = 0;
 
-    private static var __internalDependencies:Vector.<ClassAlias>;
+    private static var __internalDependencies:Vector.<String>;
     private static var __internalAliasesToRegister:Vector.<ClassAlias>;
     private static var __count:uint;
 
@@ -102,7 +94,8 @@ public final class Thread extends EventDispatcher implements IThread {
 
     private var _callLater:Array;
 
-    private var _dependencies:Array;
+    private var _collectedDependencies:Array;
+    private var _collectedAliasesToRegister:Vector.<ClassAlias>;
     private var _workerReady:Boolean;
 
     private var _isNew:Boolean = true;
@@ -118,45 +111,38 @@ public final class Thread extends EventDispatcher implements IThread {
     private var _currentState:String = ThreadState.NEW;
 
     {
-        __internalDependencies = new Vector.<ClassAlias>();
-
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.util.Closure", Closure);
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.util.DecodedMessage", DecodedMessage);
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadFaultEvent", ThreadFaultEvent);
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadResultEvent", ThreadResultEvent);
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadProgressEvent", ThreadProgressEvent);
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadActionRequestEvent", ThreadActionRequestEvent);
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadActionResponseEvent", ThreadActionResponseEvent);
-        __internalDependencies[__internalDependencies.length] = new ClassAlias("com.doublefx.as3.thread.error.NotImplementedRunnableError", NotImplementedRunnableError);
+        __internalDependencies = Vector.<String>(["com.doublefx.as3.thread.util.Closure",
+            "com.doublefx.as3.thread.util.DecodedMessage",
+            "com.doublefx.as3.thread.event.ThreadFaultEvent",
+            "com.doublefx.as3.thread.event.ThreadResultEvent",
+            "com.doublefx.as3.thread.event.ThreadProgressEvent",
+            "com.doublefx.as3.thread.event.ThreadActionRequestEvent",
+            "com.doublefx.as3.thread.event.ThreadActionResponseEvent",
+            "com.doublefx.as3.thread.error.NotImplementedRunnableError",
+            "com.doublefx.as3.thread.util.ClassAlias"]);
     }
 
     {
         __internalAliasesToRegister = new Vector.<ClassAlias>();
 
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("Class", Class);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("RegExp", RegExp);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("Error", Error);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("ArgumentError", ArgumentError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("DefinitionError", DefinitionError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("EvalError", EvalError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("RangeError", RangeError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("ReferenceError", ReferenceError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("SecurityError", SecurityError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("SyntaxError", SyntaxError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("TypeError", TypeError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("URIError", URIError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("VerifyError", VerifyError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("UninitializedError", UninitializedError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.IOError", IOError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.EOFError", EOFError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.MemoryError", MemoryError);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.IllegalOperationError", IllegalOperationError);
-
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadFaultEvent", ThreadFaultEvent);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadResultEvent", ThreadResultEvent);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadProgressEvent", ThreadProgressEvent);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.event.ThreadActionResponseEvent", ThreadActionResponseEvent);
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("com.doublefx.as3.thread.error.NotImplementedRunnableError", NotImplementedRunnableError);
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("Class");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("RegExp");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("Error");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("ArgumentError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("DefinitionError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("EvalError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("RangeError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("ReferenceError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("SecurityError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("SyntaxError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("TypeError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("URIError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("VerifyError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("UninitializedError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.IOError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.EOFError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.MemoryError");
+        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.IllegalOperationError");
     }
 
 
@@ -166,31 +152,31 @@ public final class Thread extends EventDispatcher implements IThread {
      * @param runnable A class that implements Runnable.
      * @param name The name of the Thread.
      * @param giveAppPrivileges (default = false) — indicates whether the worker should be given application sandbox privileges in AIR. This parameter is ignored in Flash Player
-     * @param extraDependencies Some extra dependencies that can't be automatically discovered.
-     * If you define a custom alias, do it using the RemoteClass tag, otherwise it will generate a TypeError: Error #1034
+     * @param extraDependencies Qualified or fully qualified name of the extra dependencies that can't be automatically discovered.
+     * To define alias, do it using the RemoteClass tag, otherwise it will generate a TypeError: Error #1034
      * @param loaderInfo The loader info where the code of this lib and the Runnable stands, FlexGlobals.topLevelApplication.loaderInfo if none is provided.
      * @param workerDomain The Worker domain in which the Worker will be created, WorkerDomain.current if none is provided.
      */
-    public function Thread(runnable:Class = null, name:String = null, giveAppPrivileges:Boolean = false, extraDependencies:Vector.<ClassAlias> = null, loaderInfo:LoaderInfo = null, workerDomain:WorkerDomain = null):void {
+    public function Thread(runnable:Class = null, name:String = null, giveAppPrivileges:Boolean = false, extraDependencies:Vector.<String> = null, loaderInfo:LoaderInfo = null, workerDomain:WorkerDomain = null):void {
         if (WorkerDomain.isSupported) {
             _id = ++__count;
             _name = name;
 
             if (runnable) {
 
+                registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
+
                 loaderInfo ||= DEFAULT_LOADER_INFO;
                 _runnableClassName = ClassUtils.getFullyQualifiedName(runnable, true);
 
                 if (loaderInfo) {
 
-                    extraDependencies = extractClassesFromPackages(loaderInfo.applicationDomain, extraDependencies);
-                    extraDependencies = reflect(loaderInfo.applicationDomain, extraDependencies);
+                    if (extraDependencies)
+                        extraDependencies = extractClassesFromPackages(loaderInfo.applicationDomain, extraDependencies);
 
-                    for each (var classAlias:ClassAlias in extraDependencies) {
-                        _dependencies[_dependencies.length] = ClassUtils.convertFullyQualifiedName(classAlias.alias);
-                    }
+                    reflect(loaderInfo.applicationDomain, extraDependencies);
 
-                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _dependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
+                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _collectedDependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
 
                     _incomingChannel = _worker.createMessageChannel(Worker.current);
@@ -202,7 +188,7 @@ public final class Thread extends EventDispatcher implements IThread {
                     _worker.setSharedProperty(getQualifiedClassName(ThreadRunner) + "outgoing", _incomingChannel);
 
                     registerClassAliases(__internalAliasesToRegister);
-                    registerClassAliases(extraDependencies);
+                    registerClassAliases(_collectedAliasesToRegister);
                 }
             }
         } else {
@@ -210,13 +196,48 @@ public final class Thread extends EventDispatcher implements IThread {
         }
     }
 
-    private static function extractClassesFromPackages(applicationDomain:ApplicationDomain, extraDependencies:Vector.<ClassAlias>):Vector.<ClassAlias> {
+    /**
+     * @private
+     *
+     *  This method will register those aliases to the caller and callee Threads if not already registered.
+     *
+     *  @see flash.net.registerClassAlias
+     *
+     * @param aliases A vector of ClassAliases.
+     */
+    private function registerClassAliases(aliases:Vector.<ClassAlias>):void {
+
+        const aliasesToRegister:Array = [];
+
+        for each (var classAlias:ClassAlias in aliases) {
+            if (StringUtils.isEmpty(classAlias.alias))
+                classAlias.alias = ClassUtils.convertFullyQualifiedName(classAlias.fullyQualifiedName);
+
+            aliasesToRegister[aliasesToRegister.length] = [classAlias.fullyQualifiedName, classAlias.alias];
+
+            var cls:Class = getDefinitionByName(classAlias.fullyQualifiedName) as Class;
+            registerClassAlias(classAlias.alias, cls);
+        }
+
+        if (_worker && _worker.state == WorkerState.RUNNING)
+            command(_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliasesToRegister);
+        else
+            callLater(function ():void {
+                const v:uint = commandInterval;
+                commandInterval = 0;
+                command(_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliasesToRegister);
+                commandInterval = v;
+                _workerReady = true;
+            });
+    }
+
+    private static function extractClassesFromPackages(applicationDomain:ApplicationDomain, extraDependencies:Vector.<String>):Vector.<String> {
         const more:Array = [];
         for (var i:uint = 0; i < extraDependencies.length; i++) {
-            const alias:ClassAlias = extraDependencies[i];
-            if (StringUtils.endsWith(alias.alias, ".*")) {
+            const alias:String = extraDependencies[i];
+            if (StringUtils.endsWith(alias, ".*")) {
                 extraDependencies.splice(i, 1);
-                const packageBase:String = alias.alias.substr(0, alias.alias.indexOf(".*")) + ":";
+                const packageBase:String = alias.substr(0, alias.indexOf(".*")) + ":";
                 const definitionNames:Vector.<String> = applicationDomain.getQualifiedDefinitionNames();
                 for each (var definitionName:String in definitionNames) {
                     if (StringUtils.startsWith(definitionName, packageBase)) {
@@ -228,51 +249,63 @@ public final class Thread extends EventDispatcher implements IThread {
 
         if (more.length > 0)
             for each (var definition:String in more) {
-                extraDependencies[extraDependencies.length] = new ClassAlias(definition);
+                extraDependencies[extraDependencies.length] = definition;
             }
 
         return extraDependencies;
     }
 
-    private function reflect(domain:ApplicationDomain, extraDependencies:Vector.<ClassAlias>):Vector.<ClassAlias> {
-        var classAlias:ClassAlias;
+    private function reflect(domain:ApplicationDomain, extraDependencies:Vector.<String>):void {
+        var className:String;
 
         const threadRunnerClassName:String = ClassUtils.getFullyQualifiedName(ThreadRunner, true);
         const threadRunnerType:Type = Type.forName(threadRunnerClassName, domain);
-        _dependencies = ThreadDependencyHelper.collectDependencies(threadRunnerType);
+        _collectedDependencies = ThreadDependencyHelper.collectDependencies(threadRunnerType);
 
         const runnableType:Type = Type.forName(_runnableClassName, domain);
         const runnableDependencies:Array = ThreadDependencyHelper.collectDependencies(runnableType);
 
-        if (_dependencies.length > 0)
-            _dependencies.shift();
+        if (_collectedDependencies.length > 0)
+            _collectedDependencies.shift();
 
         if (__internalDependencies && __internalDependencies.length > 0)
-            for each (classAlias in __internalDependencies) {
-                ThreadDependencyHelper.addUniquely(classAlias.alias, _dependencies);
+            for each (className in __internalDependencies) {
+                ThreadDependencyHelper.addUniquely(className, _collectedDependencies);
             }
 
         if (runnableDependencies.length > 0)
-            for each (var className:String in runnableDependencies) {
+            for each (className in runnableDependencies) {
                 className = ClassUtils.convertFullyQualifiedName(className);
-                ThreadDependencyHelper.addUniquely(className, _dependencies);
+                ThreadDependencyHelper.addUniquely(className, _collectedDependencies);
                 if (className != _runnableClassName && className.indexOf("com.doublefx.as3.thread.") != 0) {
                     if (!extraDependencies)
-                        extraDependencies = new Vector.<ClassAlias>();
+                        extraDependencies = new Vector.<String>();
 
-                    extraDependencies[extraDependencies.length] = new ClassAlias(className, getDefinitionByName(className) as Class);
+                    extraDependencies[extraDependencies.length] = className;
                 }
             }
 
         if (extraDependencies && extraDependencies.length > 0)
-            for each (classAlias in extraDependencies) {
-                if (classAlias.classObject) {
-                    const qualifiedName:String = ClassUtils.getFullyQualifiedName(classAlias.classObject, true);
-                    ThreadDependencyHelper.addUniquely(qualifiedName, _dependencies);
+            for each (className in extraDependencies) {
+                if (className) {
+                    const qualifiedName:String = ClassUtils.convertFullyQualifiedName(className);
+                    ThreadDependencyHelper.addUniquely(qualifiedName, _collectedDependencies);
                 }
             }
 
-        return extraDependencies;
+        if (!_collectedAliasesToRegister)
+            _collectedAliasesToRegister = new Vector.<ClassAlias>();
+
+        for each (className in _collectedDependencies) {
+            try {
+                const dependency:Type = Type.forName(className, domain);
+                if (dependency) {
+                    const classAlias:ClassAlias = ThreadDependencyHelper.collectAliases(dependency);
+                    if (classAlias)
+                        _collectedAliasesToRegister[_collectedAliasesToRegister.length] = classAlias;
+                }
+            } catch (e:Error) {}
+        }
     }
 
     ////////////////////////////
@@ -408,8 +441,8 @@ public final class Thread extends EventDispatcher implements IThread {
         return _runnableClassName;
     }
 
-    thread_diagnostic function get dependencies():Array {
-        return _dependencies;
+    thread_diagnostic function get collectedDependencies():Array {
+        return _collectedDependencies;
     }
 
     thread_diagnostic function get incomingChannel():MessageChannel {
@@ -522,49 +555,6 @@ public final class Thread extends EventDispatcher implements IThread {
             _callLater = [];
 
         _callLater[_callLater.length] = fct;
-    }
-
-    /**
-     * @private
-     *
-     *  This method will register those aliases to the caller and callee Threads if not already registered.
-     *
-     *  @see flash.net.registerClassAlias
-     *
-     * @param aliases A vector of ClassAliases.
-     */
-    private function registerClassAliases(aliases:Vector.<ClassAlias>):void {
-
-        const aliasesToRegister:Array = [];
-
-        for each (var classAlias:ClassAlias in aliases) {
-            if (StringUtils.isEmpty(classAlias.alias) && classAlias.classObject)
-                classAlias.alias = ClassUtils.getFullyQualifiedName(classAlias.classObject, true);
-            else if (!classAlias.classObject && !StringUtils.isEmpty(classAlias.alias)) {
-                try {
-                    classAlias.classObject = getDefinitionByName(classAlias.alias) as Class;
-                } catch (e:ReferenceError) {
-                    continue;
-                }
-            }
-
-            if (classAlias.classObject) {
-                aliasesToRegister[aliasesToRegister.length] = classAlias.alias;
-
-                registerClassAlias(classAlias.alias, classAlias.classObject);
-            }
-        }
-
-        if (_worker && _worker.state == WorkerState.RUNNING)
-            command(_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliasesToRegister);
-        else
-            callLater(function ():void {
-                const v:uint = commandInterval;
-                commandInterval = 0;
-                command(_runnableClassName, ThreadRunner.REGISTER_ALIASES_METHOD, aliasesToRegister);
-                commandInterval = v;
-                _workerReady = true;
-            });
     }
 
     ////////////////////////////////////////////////////////////////
