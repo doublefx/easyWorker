@@ -38,8 +38,8 @@ public class ComplexThreadTest extends SimpleThreadTestWithNoArgs {
 
     [Before]
     override public function setUp():void {
-        const extraDependencies:Vector.<ClassAlias> = new Vector.<ClassAlias>();
-        extraDependencies[0] = new ClassAlias("workers.vo.TermsVo", TermsVo);
+        const extraDependencies:Vector.<String> = new Vector.<String>();
+        extraDependencies[0] = "workers.vo.TermsVo";
 
         _thread = new Thread(ComplexWorker, "complexRunnable", false, extraDependencies, loaderInfo);
     }
@@ -56,9 +56,9 @@ public class ComplexThreadTest extends SimpleThreadTestWithNoArgs {
 
     [Test(description="Verify dependencies content")]
     override public function testDependenciesContent():void {
-        const dependencies:Array = ["mx.core.DebuggableWorker","com.doublefx.as3.thread.api.CrossThreadDispatcher","com.doublefx.as3.thread.util.Closure","com.doublefx.as3.thread.util.DecodedMessage","com.doublefx.as3.thread.event.ThreadFaultEvent","com.doublefx.as3.thread.event.ThreadResultEvent","com.doublefx.as3.thread.event.ThreadProgressEvent","com.doublefx.as3.thread.event.ThreadActionRequestEvent","com.doublefx.as3.thread.event.ThreadActionResponseEvent","com.doublefx.as3.thread.error.NotImplementedRunnableError","workers.ComplexWorker","com.doublefx.as3.thread.api.Runnable","workers.vo.TermsVo"];
+        const dependencies:Array = ["mx.core.DebuggableWorker","com.doublefx.as3.thread.api.CrossThreadDispatcher","com.doublefx.as3.thread.util.Closure","com.doublefx.as3.thread.util.DecodedMessage","com.doublefx.as3.thread.event.ThreadFaultEvent","com.doublefx.as3.thread.event.ThreadResultEvent","com.doublefx.as3.thread.event.ThreadProgressEvent","com.doublefx.as3.thread.event.ThreadActionRequestEvent","com.doublefx.as3.thread.event.ThreadActionResponseEvent","com.doublefx.as3.thread.error.NotImplementedRunnableError","com.doublefx.as3.thread.util.ClassAlias","workers.ComplexWorker","com.doublefx.as3.thread.api.Runnable","workers.vo.TermsVo"];
 
-        assertThat(Thread(_thread).collectedDependencies.toArray(), arrayExact(dependencies));
+        assertThat(Thread(_thread).collectedDependencies, arrayExact(dependencies));
     }
 
     [Test(description="Verify the Runnable class name")]
