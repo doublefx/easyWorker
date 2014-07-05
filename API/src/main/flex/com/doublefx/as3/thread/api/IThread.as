@@ -27,7 +27,7 @@ import flash.events.IEventDispatcher;
  * All we need to play with the Thread class.
  */
 [Bindable]
-public interface IThread extends IEventDispatcher{
+public interface IThread extends IWorker, IEventDispatcher{
 
     /**
      * Start a Thread and call the Runnable's run method.

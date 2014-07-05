@@ -33,8 +33,6 @@ import com.codeazur.as3swf.tags.TagSetBackgroundColor;
 import com.codeazur.as3swf.tags.TagShowFrame;
 import com.codeazur.as3swf.tags.TagSymbolClass;
 
-import flash.net.FileReference;
-
 import flash.system.Worker;
 import flash.system.WorkerDomain;
 import flash.utils.ByteArray;
@@ -139,7 +137,7 @@ public class WorkerFactory {
             swfBytes.position = 0;
 
             /*const file:FileReference = new FileReference();
-             file.save(swfBytes, "Worker3.swf");*/
+             file.save(swfBytes, "Worker.swf");*/
 
             if (!domain) domain = WorkerDomain.current;
 

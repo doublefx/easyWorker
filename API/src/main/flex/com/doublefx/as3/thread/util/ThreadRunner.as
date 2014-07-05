@@ -33,6 +33,7 @@ import com.doublefx.as3.thread.event.ThreadProgressEvent;
 import com.doublefx.as3.thread.event.ThreadResultEvent;
 
 import flash.events.Event;
+import flash.net.SharedObject;
 import flash.net.registerClassAlias;
 import flash.system.MessageChannel;
 import flash.system.Worker;
@@ -74,12 +75,21 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
 
         if (!Worker.current.isPrimordial) {
             registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
+            registerClassAlias("flash.net.SharedObject", SharedObject);
 
             _incomingChannel = Worker.current.getSharedProperty(getQualifiedClassName(this) + "incoming") as MessageChannel;
             _outgoingChannel = Worker.current.getSharedProperty(getQualifiedClassName(this) + "outgoing") as MessageChannel;
 
             _incomingChannel.addEventListener(Event.CHANNEL_MESSAGE, onMessage);
         }
+    }
+
+    public function setSharedProperty(key:String, value:*):void {
+        Worker.current.setSharedProperty(key, value);
+    }
+
+    public function getSharedProperty(key:String):* {
+        return Worker.current.getSharedProperty(key);
     }
 
     protected function onMessage(e:Event):void {
@@ -272,6 +282,10 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     public function dispatchResult(result:*):void {
         trace("ThreadRunner dispatchResult: " + result);
         _outgoingChannel.send(new ThreadResultEvent(result));
+    }
+
+    public function get currentThreadName():String {
+        return Worker.current.getSharedProperty("com.doublefx.as3.thread.name");
     }
 }
 }

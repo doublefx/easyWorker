@@ -36,14 +36,17 @@ import com.doublefx.as3.thread.util.WorkerFactory;
 import flash.display.LoaderInfo;
 import flash.events.Event;
 import flash.events.EventDispatcher;
+import flash.net.SharedObject;
 import flash.net.registerClassAlias;
 import flash.system.ApplicationDomain;
 import flash.system.Capabilities;
 import flash.system.MessageChannel;
 import flash.system.MessageChannelState;
+import flash.system.System;
 import flash.system.Worker;
 import flash.system.WorkerDomain;
 import flash.system.WorkerState;
+import flash.utils.Dictionary;
 import flash.utils.getDefinitionByName;
 import flash.utils.getQualifiedClassName;
 import flash.utils.setTimeout;
@@ -92,6 +95,8 @@ public final class Thread extends EventDispatcher implements IThread {
     private var _incomingChannel:MessageChannel;
     private var _outgoingChannel:MessageChannel;
 
+    private var _sharedProperties:Dictionary;
+
     private var _callLater:Array;
 
     private var _collectedDependencies:Array;
@@ -111,7 +116,9 @@ public final class Thread extends EventDispatcher implements IThread {
     private var _currentState:String = ThreadState.NEW;
 
     {
-        __internalDependencies = Vector.<String>(["com.doublefx.as3.thread.util.Closure",
+        __internalDependencies = Vector.<String>([
+            "com.doublefx.as3.thread.api.Runnable",
+            "com.doublefx.as3.thread.util.Closure",
             "com.doublefx.as3.thread.util.DecodedMessage",
             "com.doublefx.as3.thread.event.ThreadFaultEvent",
             "com.doublefx.as3.thread.event.ThreadResultEvent",
@@ -145,7 +152,6 @@ public final class Thread extends EventDispatcher implements IThread {
         __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.IllegalOperationError");
     }
 
-
     /**
      * Constructor.
      *
@@ -164,7 +170,9 @@ public final class Thread extends EventDispatcher implements IThread {
 
             if (runnable) {
 
+                _sharedProperties = new Dictionary();
                 registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
+                registerClassAlias("flash.net.SharedObject", SharedObject);
 
                 loaderInfo ||= DEFAULT_LOADER_INFO;
                 _runnableClassName = ClassUtils.getFullyQualifiedName(runnable, true);
@@ -178,6 +186,7 @@ public final class Thread extends EventDispatcher implements IThread {
 
                     _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _collectedDependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
+                    _worker.setSharedProperty("com.doublefx.as3.thread.name", name);
 
                     _incomingChannel = _worker.createMessageChannel(Worker.current);
                     _outgoingChannel = Worker.current.createMessageChannel(_worker);
@@ -265,6 +274,14 @@ public final class Thread extends EventDispatcher implements IThread {
         const runnableType:Type = Type.forName(_runnableClassName, domain);
         const runnableDependencies:Array = ThreadDependencyHelper.collectDependencies(runnableType);
 
+        if (runnableDependencies.length > 0)
+            for each (className in runnableDependencies) {
+                className = ClassUtils.convertFullyQualifiedName(className);
+                if (className.indexOf("com.doublefx.as3.thread.") != 0) {
+                    ThreadDependencyHelper.addUniquely(className, _collectedDependencies);
+                }
+            }
+
         if (_collectedDependencies.length > 0)
             _collectedDependencies.shift();
 
@@ -273,23 +290,17 @@ public final class Thread extends EventDispatcher implements IThread {
                 ThreadDependencyHelper.addUniquely(className, _collectedDependencies);
             }
 
-        if (runnableDependencies.length > 0)
-            for each (className in runnableDependencies) {
-                className = ClassUtils.convertFullyQualifiedName(className);
-                ThreadDependencyHelper.addUniquely(className, _collectedDependencies);
-                if (className != _runnableClassName && className.indexOf("com.doublefx.as3.thread.") != 0) {
-                    if (!extraDependencies)
-                        extraDependencies = new Vector.<String>();
-
-                    extraDependencies[extraDependencies.length] = className;
-                }
-            }
-
         if (extraDependencies && extraDependencies.length > 0)
             for each (className in extraDependencies) {
                 if (className) {
-                    const qualifiedName:String = ClassUtils.convertFullyQualifiedName(className);
-                    ThreadDependencyHelper.addUniquely(qualifiedName, _collectedDependencies);
+                    const classType:Type = Type.forName(className, domain);
+                    const collectExtraDependencies:Array = ThreadDependencyHelper.collectDependencies(classType);
+                    for each (var dependencyName:String in collectExtraDependencies) {
+                        dependencyName = ClassUtils.convertFullyQualifiedName(dependencyName);
+                        if (dependencyName.indexOf("com.doublefx.as3.thread.") != 0) {
+                            ThreadDependencyHelper.addUniquely(dependencyName, _collectedDependencies);
+                        }
+                    }
                 }
             }
 
@@ -304,7 +315,8 @@ public final class Thread extends EventDispatcher implements IThread {
                     if (classAlias)
                         _collectedAliasesToRegister[_collectedAliasesToRegister.length] = classAlias;
                 }
-            } catch (e:Error) {}
+            } catch (e:Error) {
+            }
         }
     }
 
@@ -326,8 +338,28 @@ public final class Thread extends EventDispatcher implements IThread {
             args.unshift(runnableClassName);
 
             if (_outgoingChannel && _outgoingChannel.state == MessageChannelState.OPEN)
-                setTimeout(function ():void{_outgoingChannel.send(args)}, commandInterval);
+                setTimeout(function ():void {
+                    _outgoingChannel.send(args)
+                }, commandInterval);
         }
+    }
+
+    public function setSharedProperty(key:String, value:*):void {
+        if (!_worker)
+            _sharedProperties[key] = value;
+        else if (_worker.state != WorkerState.TERMINATED)
+            _worker.setSharedProperty(key, value);
+    }
+
+    public function getSharedProperty(key:String):* {
+        var sharedProperty:* = null;
+
+        if (!_worker)
+            sharedProperty = _sharedProperties[key];
+        else if (_worker.state != WorkerState.TERMINATED)
+            sharedProperty = _worker.getSharedProperty(key);
+
+        return sharedProperty;
     }
 
     public function start(...args):void {
@@ -463,6 +495,10 @@ public final class Thread extends EventDispatcher implements IThread {
 
         switch (worker.state) {
             case WorkerState.RUNNING:
+                for (var key:String in _sharedProperties) {
+                    _worker.setSharedProperty(key, _sharedProperties[key]);
+                }
+                _sharedProperties = null;
                 isNew = false;
                 isRunning = true;
                 _isStarting = false;
@@ -528,6 +564,9 @@ public final class Thread extends EventDispatcher implements IThread {
     private function terminateWorker():void {
         trace("Thread terminateWorker");
         _worker.terminate();
+        _sharedProperties = null;
+        System.gc(); //Collect
+        System.gc(); //Garbage
     }
 
     private function destroyWorker():void {
