@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/API/API.iml" filepath="$PROJECT_DIR$/API/API.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moreFlexDemo/BankAccount/BankAccount.iml" filepath="$PROJECT_DIR$/moreFlexDemo/BankAccount/BankAccount.iml" />
       <module fileurl="file://$PROJECT_DIR$/FlexDemo/FlexDemo.iml" filepath="$PROJECT_DIR$/FlexDemo/FlexDemo.iml" />
     </modules>
   </component>

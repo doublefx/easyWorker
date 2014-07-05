@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="Flex" version="4">
-  <component name="FlexBuildConfigurationManager" active="WebDemo">
+  <component name="FlexBuildConfigurationManager" active="BankAccountDesktop">
     <configurations>
-      <configuration name="WebDemo" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/../out/production/FlexDemo" wrapper-template-path="$MODULE_DIR$/html-template">
-        <dependencies target-player="11.5">
+      <configuration name="BankAccountDesktop" target-platform="Desktop" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/../../out/production/BankAccount">
+        <dependencies>
           <entries>
             <entry module-name="API" build-configuration-name="easyWorker">
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="Apache Flex 4.13.0 FP 11.5 AIR 3.5 fr_FR" />
+          <sdk name="Apache Flex 4.13.0 FP 13 AIR 13 fr_FR" />
         </dependencies>
         <compiler-options />
-        <packaging-air-desktop />
+        <packaging-air-desktop package-file-name="BankAccountMobile" />
         <packaging-android />
         <packaging-ios />
       </configuration>
@@ -22,9 +22,9 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/main/flex" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Apache Flex 4.13.0 FP 11.5 AIR 3.5 fr_FR" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="Apache Flex 4.13.0 FP 13 AIR 13 fr_FR" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="API" exported="" />
   </component>
