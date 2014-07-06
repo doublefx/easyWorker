@@ -46,7 +46,7 @@ public class SimpleThreadTestWithOneArgs extends SimpleThreadTestWithNoArgs {
 
     [Test(description="Verify dependencies content")]
     override public function testDependenciesContent():void {
-        const dependencies:Array = ["mx.core.DebuggableWorker","com.doublefx.as3.thread.api.CrossThreadDispatcher","com.doublefx.as3.thread.util.Closure","com.doublefx.as3.thread.util.DecodedMessage","com.doublefx.as3.thread.event.ThreadFaultEvent","com.doublefx.as3.thread.event.ThreadResultEvent","com.doublefx.as3.thread.event.ThreadProgressEvent","com.doublefx.as3.thread.event.ThreadActionRequestEvent","com.doublefx.as3.thread.event.ThreadActionResponseEvent","com.doublefx.as3.thread.error.NotImplementedRunnableError","com.doublefx.as3.thread.util.ClassAlias","workers.SimpleWorkerWithOneArg","com.doublefx.as3.thread.api.Runnable"];
+        const dependencies:Array = ["mx.core.DebuggableWorker","com.doublefx.as3.thread.api.CrossThreadDispatcher","com.doublefx.as3.thread.api.IWorker","workers.SimpleWorkerWithOneArg","com.doublefx.as3.thread.api.Runnable","com.doublefx.as3.thread.util.Closure","com.doublefx.as3.thread.util.DecodedMessage","com.doublefx.as3.thread.event.ThreadFaultEvent","com.doublefx.as3.thread.event.ThreadResultEvent","com.doublefx.as3.thread.event.ThreadProgressEvent","com.doublefx.as3.thread.event.ThreadActionRequestEvent","com.doublefx.as3.thread.event.ThreadActionResponseEvent","com.doublefx.as3.thread.error.NotImplementedRunnableError","com.doublefx.as3.thread.util.ClassAlias"];
 
         assertThat(Thread(_thread).collectedDependencies, arrayExact(dependencies));
     }
