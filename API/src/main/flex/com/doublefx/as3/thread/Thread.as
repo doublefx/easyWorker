@@ -293,13 +293,18 @@ public final class Thread extends EventDispatcher implements IThread {
         if (extraDependencies && extraDependencies.length > 0)
             for each (className in extraDependencies) {
                 if (className) {
-                    const classType:Type = Type.forName(className, domain);
-                    const collectExtraDependencies:Array = ThreadDependencyHelper.collectDependencies(classType);
-                    for each (var dependencyName:String in collectExtraDependencies) {
-                        dependencyName = ClassUtils.convertFullyQualifiedName(dependencyName);
-                        if (dependencyName.indexOf("com.doublefx.as3.thread.") != 0) {
-                            ThreadDependencyHelper.addUniquely(dependencyName, _collectedDependencies);
+                    try {
+                        const classType:Type = Type.forName(className, domain);
+                        const collectExtraDependencies:Array = ThreadDependencyHelper.collectDependencies(classType);
+                        for each (var dependencyName:String in collectExtraDependencies) {
+                            dependencyName = ClassUtils.convertFullyQualifiedName(dependencyName);
+                            if (dependencyName.indexOf("com.doublefx.as3.thread.") != 0) {
+                                ThreadDependencyHelper.addUniquely(dependencyName, _collectedDependencies);
+                            }
                         }
+                    } catch (e:Error) {
+                        var qualifiedName:String = ClassUtils.convertFullyQualifiedName(className);
+                        ThreadDependencyHelper.addUniquely(qualifiedName, _collectedDependencies);
                     }
                 }
             }
