@@ -34,7 +34,7 @@ public class WithdrawMoney implements Runnable {
     private var _mutex:Mutex;
 
     /**
-     * Public to make it automatically detectable, otherwise,
+     * Public to make it automatically reflected, otherwise,
      * use the extraDependency argument of the Thread's constructor.
      */
     public var bankAccount:BankAccount;
@@ -57,12 +57,11 @@ public class WithdrawMoney implements Runnable {
 
         dispatcher.dispatchResult(dispatcher.currentThreadName + " is trying to withdraw " + amount);
 
-        bankAccount.addEventListener(Event.COMPLETE, bankAccount_completeHandler);
+        bankAccount.addEventListener("withdrawComplete", bankAccount_withdrawCompleteHandler);
         bankAccount.withdraw(amount);
     }
 
-    private function bankAccount_completeHandler(event:Event):void {
-
+    private function bankAccount_withdrawCompleteHandler(event:Event):void {
         _sharedAccount.clear();
         _sharedAccount.writeObject(bankAccount);
 

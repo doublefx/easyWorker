@@ -28,7 +28,7 @@ import flash.utils.IDataOutput;
 import flash.utils.IExternalizable;
 import flash.utils.setTimeout;
 
-[RemoteClass(alias="worker.vo.BankAccount")]
+[RemoteClass(alias="worker.BankAccount")]
 public class BankAccount extends EventDispatcher implements IExternalizable{
 
     private var _balance:int = 200;
@@ -42,6 +42,8 @@ public class BankAccount extends EventDispatcher implements IExternalizable{
 
     public function withdraw(amount:int):void {
         // We simulate a remote call to do our withdraw method, this call will take between 100 and 500 ms.
+        // Doing so, concurrent Threads are not guaranteed to be executed in order, so we can test our Threads
+        // work as expected when sharing data using mutex.
         setTimeout(simulateRemoteWithdrawCall, Math.floor(Math.random() * (1 + 500 - 100)) + 100, amount);
     }
 
@@ -52,7 +54,7 @@ public class BankAccount extends EventDispatcher implements IExternalizable{
         } else
             trace("Not enough money on the account");
 
-        dispatchEvent(new Event(Event.COMPLETE));
+        dispatchEvent(new Event("withdrawComplete"));
     }
 
     public function writeExternal(output:IDataOutput):void {
