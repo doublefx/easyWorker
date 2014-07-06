@@ -1,4 +1,4 @@
-easyWorker
+easyWorkerAS3
 ==========
 
 Pure AS3 library to easily implement Workers.
