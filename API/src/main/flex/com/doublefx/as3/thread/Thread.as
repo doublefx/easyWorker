@@ -156,6 +156,8 @@ public final class Thread extends EventDispatcher implements IThread {
      * @param name The name of the Thread.
      * @param giveAppPrivileges (default = false) — indicates whether the worker should be given application sandbox privileges in AIR. This parameter is ignored in Flash Player
      * @param extraDependencies Qualified or fully qualified name of the extra dependencies that can't be automatically discovered.
+     * Will automatically add all reflected dependencies.
+     * Accepts wildcard at the end of the qualified name eg. <code>const aliases:Vector.<String> = Vector.<String>(["fr.kikko.lab.ShineMP3Encoder", "cmodule.shine.*"]);</code>
      * To define alias, do it using the RemoteClass tag, otherwise it will generate a TypeError: Error #1034
      * @param loaderInfo The loader info where the code of this lib and the Runnable stands, FlexGlobals.topLevelApplication.loaderInfo if none is provided.
      * @param workerDomain The Worker domain in which the Worker will be created, WorkerDomain.current if none is provided.
