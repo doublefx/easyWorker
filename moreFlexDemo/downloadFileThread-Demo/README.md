@@ -1,7 +1,7 @@
 downloadFileWorker
 ==========
 
-This is Thread based implement of [downloadFileWorker] [1], for more details, follow its link.
+This is a Thread based implementation of [downloadFileWorker] [1], for more details, follow its link.
 
 [1]:https://github.com/doublefx/downloadFileWorker
 
