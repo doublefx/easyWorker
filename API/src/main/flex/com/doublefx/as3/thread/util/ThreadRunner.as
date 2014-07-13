@@ -280,12 +280,20 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     }
 
     public function dispatchResult(result:*):void {
-        trace("ThreadRunner dispatchResult: " + result);
+        //trace("ThreadRunner dispatchResult: " + result);
         _outgoingChannel.send(new ThreadResultEvent(result));
+    }
+
+    public function dispatchArbitraryEvent(event:Event):void {
+        _outgoingChannel.send(event);
     }
 
     public function get currentThreadName():String {
         return Worker.current.getSharedProperty("com.doublefx.as3.thread.name");
+    }
+
+    public function get currentThreadId():String {
+        return Worker.current.getSharedProperty("com.doublefx.as3.thread.id");
     }
 }
 }
