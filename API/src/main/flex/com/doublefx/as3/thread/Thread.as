@@ -63,10 +63,10 @@ import org.as3commons.reflect.Type;
 /**
  * Create and Manage a Worker for a given Runnable.
  */
-public final class Thread extends EventDispatcher implements IThread {
+public class Thread extends EventDispatcher implements IThread {
 
     /**
-     * The Default LoaderInfo used by all new created Threads when none is provided to its constructor.
+     * The Default LoaderInfo used by all new created Thread when none is provided to its constructor.
      *
      * For Flex / AIR, the default is FlexGlobals.topLevelApplication.loaderInfo
      * For Flash, there is no default, you need to provide the one containing this easyWorker library and your runnables,
@@ -185,7 +185,8 @@ public final class Thread extends EventDispatcher implements IThread {
 
                     _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _collectedDependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
-                    _worker.setSharedProperty("com.doublefx.as3.thread.name", name);
+                    _worker.setSharedProperty("com.doublefx.as3.thread.name", _name);
+                    _worker.setSharedProperty("com.doublefx.as3.thread.id", _id);
 
                     _incomingChannel = _worker.createMessageChannel(Worker.current);
                     _outgoingChannel = Worker.current.createMessageChannel(_worker);
@@ -244,11 +245,12 @@ public final class Thread extends EventDispatcher implements IThread {
         for (var i:uint = 0; i < extraDependencies.length; i++) {
             const alias:String = extraDependencies[i];
             if (StringUtils.endsWith(alias, ".*")) {
-                extraDependencies.splice(i, 1);
-                const packageBase:String = alias.substr(0, alias.indexOf(".*")) + ":";
+                extraDependencies.splice(i--, 1);
+                const packageBase:String = alias.substr(0, alias.indexOf(".*")) + "::";
+                const packageBaseEx:String = alias.substr(0, alias.indexOf(".*")) + ".";
                 const definitionNames:Vector.<String> = applicationDomain.getQualifiedDefinitionNames();
                 for each (var definitionName:String in definitionNames) {
-                    if (StringUtils.startsWith(definitionName, packageBase)) {
+                    if (StringUtils.startsWith(definitionName, packageBase) || StringUtils.startsWith(definitionName, packageBaseEx)) {
                         more[more.length] = definitionName;
                     }
                 }

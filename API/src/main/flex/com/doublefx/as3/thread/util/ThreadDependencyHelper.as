@@ -140,8 +140,10 @@ public class ThreadDependencyHelper {
                 for each (var method:Method in codeType.methods) {
                     const returnTypeName:String = method.returnTypeName;
                     if (isValidTypeName(returnTypeName)) {
-                        const returnType:Type = method.returnType;
-                        collectDependencies(Type.forName(returnType.fullName, returnType.applicationDomain), returnArray);
+                        const returnType:Type = method.returnType ;
+                        fullName = getFullName(returnType, method.returnTypeName);
+                        if (fullName)
+                            collectDependencies(Type.forName(fullName, returnType ? returnType.applicationDomain : null), returnArray);
                     }
                     parameters = method.parameters;
                     if (parameters.length > 0) {
@@ -156,6 +158,18 @@ public class ThreadDependencyHelper {
             }
         }
         return returnArray;
+    }
+
+    private static function getFullName(returnType:Type, returnTypeName:String):String {
+        var fullName:String;
+        if (returnType)
+            fullName = returnType.fullName;
+        else {
+            var indexOf:int = returnTypeName.indexOf("::");
+            if (indexOf > -1)
+                fullName = returnTypeName.substring(indexOf + 2);
+        }
+        return fullName;
     }
 
     public static function collectAliases(dependency:Type):ClassAlias {

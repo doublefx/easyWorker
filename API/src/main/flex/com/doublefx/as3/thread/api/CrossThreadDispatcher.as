@@ -21,7 +21,8 @@
  * User: Frederic THOMAS Date: 15/06/2014 Time: 14:00
  */
 package com.doublefx.as3.thread.api {
-import com.doublefx.as3.thread.api.IWorker;
+
+import flash.events.Event;
 
 import flash.events.IEventDispatcher;
 
@@ -35,6 +36,8 @@ public interface CrossThreadDispatcher extends IWorker, IEventDispatcher{
     function dispatchProgress(current:uint, total:uint):void;
     function dispatchError(error:Error):void;
     function dispatchResult(result:*):void;
+    function dispatchArbitraryEvent(event:Event):void;
     function get currentThreadName():String;
+    function get currentThreadId():String
 }
 }
