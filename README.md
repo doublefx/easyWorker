@@ -315,5 +315,7 @@ This library is inspired by [worker-from-class] [6] and [Developer-friendly AS W
 [7]:http://myappsnippet.com/developer-friendly-workers-api/
 [8]:http://www.sharebeast.com/c18uwjjf532s
 [9]:https://github.com/doublefx/easyWorker/tree/PureAS3
+[10]:https://twitter.com/webDoubleFx
 
 Enjoy and don't hesitate to give me your feedback.
+[Follow me on tweeter] [10]
