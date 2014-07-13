@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  - Copyright (c) 2014 Frédéric Thomas
+  -
+  - Licensed to the Apache Software Foundation (ASF) under one or more
+  - contributor license agreements.  See the NOTICE file distributed with
+  - this work for additional information regarding copyright ownership.
+  - The ASF licenses this file to You under the Apache License, Version 2.0
+  - (the "License"); you may not use this file except in compliance with
+  - the License.  You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:component="presentation.view.*"
+         implements="infrastructure.thread.api.downloadFileWorker.IDownloadFileWorkerUIBinder"
+         enabled="false">
+
+    <fx:Script>
+		<![CDATA[
+        import com.doublefx.as3.thread.event.ThreadFaultEvent;
+        import com.doublefx.as3.thread.event.ThreadProgressEvent;
+        import com.doublefx.as3.thread.event.ThreadResultEvent;
+
+        import infrastructure.thread.api.downloadFileWorker.IDownloader;
+        import infrastructure.thread.api.downloadFileWorker.IDownloadFileWorkerTelemetry;
+
+        import mx.controls.Alert;
+
+        private var _downloader:IDownloader;
+
+        [Bindable]
+        private var _telemetry:IDownloadFileWorkerTelemetry;
+
+        [Bindable]
+        public function get downloader():IDownloader {
+            return _downloader;
+        }
+
+        public function set downloader(v:IDownloader):void {
+            _downloader = v;
+            if (_downloader is IDownloadFileWorkerTelemetry)
+                _telemetry = _downloader as IDownloadFileWorkerTelemetry;
+
+            this.enabled = true;
+        }
+
+        [Bindable]
+        private var _progressLabel:String = "CurrentProgress 0%";
+
+        public function onProgress(event:ThreadProgressEvent):void {
+            doPercentCompleted(event.current, event.total);
+        }
+
+        public function onError(event:ThreadFaultEvent):void {
+            unloadWorker();
+            doPercentCompleted(_downloader.fileDescriptor.bytesLoaded, _downloader.fileDescriptor.bytesTotal);
+            Alert.show(event.fault.message, "Error: " + (event.fault.errorID == 0) ? "" : event.fault.errorID.toString());
+        }
+
+        public function onCompleted(event:ThreadResultEvent):void {
+            unloadWorker();
+            doPercentCompleted(1, 1);
+        }
+
+        public function unloadWorker():void {
+            this.enabled = false;
+            downloader.terminate();
+        }
+
+        private function doPercentCompleted(bytesLoaded:Number, bytesTotal:Number):void {
+            var percentComplete:Number = bytesLoaded * 100 / bytesTotal;
+
+            progressBarFormatter.fractionalDigits = downloader.fileDescriptor.progressPrecision;
+            progressBar.setProgress(percentComplete, 100);
+
+            _progressLabel = progressBarFormatter.format(percentComplete) + "% complete";
+            _progressLabel += _telemetry ? " (" + speedFormatter.format(_telemetry.numberOfBytesPerSecondAverage / 1000) + " Kb/s)" : "";
+        }
+        ]]>
+	</fx:Script>
+
+    <fx:Declarations>
+        <s:NumberFormatter id="progressBarFormatter"
+                           fractionalDigits="0"/>
+        <s:NumberFormatter id="speedFormatter"
+                           fractionalDigits="2"/>
+    </fx:Declarations>
+
+    <s:layout>
+        <s:VerticalLayout horizontalAlign="center"/>
+    </s:layout>
+
+    <s:Label text="{downloader.fileDescriptor.fileUrl}"/>
+
+    <s:HGroup>
+        <s:VGroup horizontalAlign="center">
+            <mx:ProgressBar id="progressBar" labelPlacement="center"
+                            color="black"
+                            chromeColor="red"
+                            minimum="0" visible="true" maximum="100"
+                            label="{_progressLabel}"
+                            direction="right" mode="manual" width="300"/>
+
+            <s:CheckBox id="useCacheCB" label="useCache"
+                        selected="{downloader.useCache}"
+                        change="downloader.useCache = useCacheCB.selected"
+                        enabled="{!downloader.isRunning}"/>
+
+            <s:HGroup verticalAlign="middle" id="controlGroup"
+                      color="black">
+                <s:Button id="startBtn" label="Start" click="downloader.start()" enabled="{downloader.isNew}"/>
+                <s:Button id="pauseBtn" label="Pause" click="downloader.pause()"
+                          enabled="{downloader.isRunning &amp;&amp; downloader.isResumable}"/>
+                <s:Button id="resumeBtn" label="Resume" click="downloader.resume()" enabled="{downloader.isPaused}"/>
+                <s:Button id="terminateBtn" label="Terminate" click="unloadWorker()" enabled="{downloader.isPaused || downloader.isRunning}"/>
+            </s:HGroup>
+        </s:VGroup>
+
+        <component:DownloadFileWorkerTelemetryUI telemetry="{_telemetry}"
+                                                 visible="{_telemetry != null}" includeInLayout="{_telemetry != null}"
+                                                 width="200"/>
+    </s:HGroup>
+
+</s:Group>

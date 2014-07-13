@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:component="presentation.view.*"
+                       windowComplete="windowCompleteHandler(event)"
+                       closing="closingHandler(event)"
+                       width="800" height="900"
+                       color="0xFFFFFF"
+                       backgroundColor="0x000000">
+
+    <fx:Script><![CDATA[
+        import infrastructure.thread.impl.decorator.TelemetryDecorator;
+        import infrastructure.thread.impl.factory.DownloadFileThreadFactory;
+
+        import mx.events.AIREvent;
+
+        private function windowCompleteHandler(event:AIREvent):void {
+            removeEventListener(AIREvent.WINDOW_COMPLETE, windowCompleteHandler);
+
+            // Create a DownloadFileWorker for file on a server with resuming capabilities ("Accept-Ranges") - large size.
+            DownloadFileThreadFactory.create(DownloadFileThreadFactory.FLEX_SDK, flexSDK_DownloaderUI, [TelemetryDecorator]);
+
+            // Create a DownloadFileWorker for file on a server with resuming capabilities ("Accept-Ranges") - small size.
+            DownloadFileThreadFactory.create(DownloadFileThreadFactory.GETFOLDERSIZE, getFolderSize_DownloaderUI, [TelemetryDecorator]);
+
+            // Create a DownloadFileWorker for file on a server without resuming capabilities (No "Accept-Ranges").
+            DownloadFileThreadFactory.create(DownloadFileThreadFactory.UTORRENT, utorrentDownloaderUI, [TelemetryDecorator]);
+        }
+
+        private function closingHandler(event:Event):void {
+            removeEventListener(Event.CLOSING, closingHandler);
+
+            DownloadFileThreadFactory.finalize();
+        }
+        ]]></fx:Script>
+
+    <fx:Style>
+        @namespace s "library://ns.adobe.com/flex/spark";
+        @namespace component "presentation.view.*";
+        @namespace mx "library://ns.adobe.com/flex/mx";
+
+        mx|Alert {
+            color: #000000;
+        }
+    </fx:Style>
+
+    <s:layout>
+        <s:VerticalLayout horizontalAlign="center" verticalAlign="middle"/>
+    </s:layout>
+
+    <component:DownloadFileWorkerUI id="flexSDK_DownloaderUI"/>
+    <s:Rect height="50"/>
+    <component:DownloadFileWorkerUI id="getFolderSize_DownloaderUI"/>
+    <s:Rect height="50"/>
+    <component:DownloadFileWorkerUI id="utorrentDownloaderUI"/>
+
+</s:WindowedApplication>
+

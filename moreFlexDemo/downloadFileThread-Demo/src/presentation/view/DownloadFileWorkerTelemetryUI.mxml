@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+  - Copyright (c) 2014 Frédéric Thomas
+  -
+  - Licensed to the Apache Software Foundation (ASF) under one or more
+  - contributor license agreements.  See the NOTICE file distributed with
+  - this work for additional information regarding copyright ownership.
+  - The ASF licenses this file to You under the Apache License, Version 2.0
+  - (the "License"); you may not use this file except in compliance with
+  - the License.  You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
+<!--
+  Created by Frédéric THOMAS on 17/09/13.
+-->
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark">
+
+    <fx:Script><![CDATA[
+        import infrastructure.thread.api.downloadFileWorker.IDownloadFileWorkerTelemetry;
+
+        private static const millisecondsPerDay:int = 1000 * 60 * 60 * 24;
+        private static const millisecondsPerHour:int = 1000 * 60 * 60;
+        private static const millisecondsPerMinute:int = 1000 * 60;
+        private static const millisecondsPerSecond:int = 1000;
+
+        [Bindable]
+        public var telemetry:IDownloadFileWorkerTelemetry;
+
+        private static function formatDuration(duration:Number):String {
+            var hours:uint = duration / millisecondsPerHour;
+            var minutes:uint = (duration - (hours * millisecondsPerHour)) / millisecondsPerMinute;
+            var seconds:uint = (duration - (hours * millisecondsPerHour) - (minutes * millisecondsPerMinute)) / millisecondsPerSecond;
+
+            return hours + " h " + minutes + " mn " + seconds + " s";
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+        <s:DateTimeFormatter id="dateTimeFormatter"
+                             dateTimePattern="h:mm:ss"/>
+    </fx:Declarations>
+
+    <s:Form>
+        <s:layout>
+            <s:VerticalLayout horizontalAlign="left"/>
+        </s:layout>
+        <s:FormItem id="startTimeItem" label="Started time: ">
+            <s:Label text="{telemetry.startTime ? dateTimeFormatter.format(telemetry.startTime) : '...'}"/>
+        </s:FormItem>
+        <s:FormItem id="endTimeItem" label="Ended time: ">
+            <s:Label text="{telemetry.endTime ? dateTimeFormatter.format(telemetry.endTime) : '...'}"/>
+        </s:FormItem>
+        <s:FormItem id="totalEffectiveTimeItem" label="Duration: ">
+            <s:Label text="{telemetry.totalEffectiveTime ? formatDuration(telemetry.totalEffectiveTime) : '...'}"/>
+        </s:FormItem>
+        <s:FormItem id="estimatedRemainingTimeItem" label="Remaining: ">
+            <s:Label text="{telemetry.totalEffectiveTime ? formatDuration(telemetry.estimatedRemainingTime) : '...'}"/>
+        </s:FormItem>
+    </s:Form>
+
+</s:VGroup>
