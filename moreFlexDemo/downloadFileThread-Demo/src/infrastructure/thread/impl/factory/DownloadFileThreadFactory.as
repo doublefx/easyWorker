@@ -24,10 +24,9 @@ import flash.desktop.NativeApplication;
 import flash.filesystem.File;
 import flash.utils.Dictionary;
 
-import infrastructure.thread.api.downloadFileWorker.IDownloader;
 import infrastructure.thread.api.downloadFileWorker.IDownloadFileWorkerUIBinder;
+import infrastructure.thread.api.downloadFileWorker.IDownloader;
 import infrastructure.thread.impl.DownloadFileThread;
-import infrastructure.thread.impl.util.RegisterUtil;
 import infrastructure.thread.impl.util.db.Registry;
 
 public class DownloadFileThreadFactory {
@@ -104,7 +103,6 @@ public class DownloadFileThreadFactory {
         DownloadFileThread.dbPath = File.applicationStorageDirectory.resolvePath(DATABASE_NAME).nativePath;
         Registry.connect(DownloadFileThread.dbPath, NativeApplication.nativeApplication.applicationID);
 
-        RegisterUtil.registerClassAliases();
         createCache();
 
         __downloaders = new Dictionary(true);
