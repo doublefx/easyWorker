@@ -53,7 +53,7 @@ This library is inspired by [worker-from-class] [6] and [Developer-friendly AS W
 [5]:http://www.as3commons.org/as3-commons-reflect/introduction.html
 [6]:https://github.com/bortsen/worker-from-class
 [7]:http://myappsnippet.com/developer-friendly-workers-api/
-[8]:http://www.sharebeast.com/ab7wbd1rwqh2
+[8]:http://www.sharebeast.com/ojnpyiqgmgg8
 [9]:https://github.com/doublefx/easyWorker
 [10]:http://www.sharebeast.com/yhxzr2jbkem0
 
