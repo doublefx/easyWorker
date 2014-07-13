@@ -313,7 +313,7 @@ This library is inspired by [worker-from-class] [6] and [Developer-friendly AS W
 [5]:http://www.as3commons.org/as3-commons-reflect/introduction.html
 [6]:https://github.com/bortsen/worker-from-class
 [7]:http://myappsnippet.com/developer-friendly-workers-api/
-[8]:http://www.sharebeast.com/sqzznjmlj4u4
+[8]:http://www.sharebeast.com/c18uwjjf532s
 [9]:https://github.com/doublefx/easyWorker/tree/PureAS3
 
 Enjoy and don't hesitate to give me your feedback.
