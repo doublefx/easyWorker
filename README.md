@@ -185,6 +185,7 @@ You can intercept a call to pause, resume and terminate from your Runnable, see:
      }
  }
  }
+```
 
 How to build it ?
 ----
