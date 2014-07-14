@@ -204,21 +204,21 @@ Examples :
 You will find in the sub-directory of the Master and PureAS3 project, some 
 web, desktop and mobile examples for Flex/AIR and pure AS3 project, The last ones :
  
- [https://github.com/doublefx/easyWorker/tree/master/moreFlexDemo/downloadFileThread-Demo]
+ https://github.com/doublefx/easyWorker/tree/master/moreFlexDemo/downloadFileThread-Demo
  
  A thread based implementation of a simple tool to download / copy files running in a Thread, with persistent pause / resume capabilities and automatic re-download if the file has changed on the server after a long pause.
  
- [https://github.com/doublefx/easyWorker-ActiveAIRCord}
+ https://github.com/doublefx/easyWorker-ActiveAIRCord
   
- Requested by the creator of ActiveAIRCord [https://github.com/riadvice/ActiveAIRCord] , An easy to use library using the Active Record pattern to access SQLite
+ Requested by the creator of ActiveAIRCord https://github.com/riadvice/ActiveAIRCord , An easy to use library using the Active Record pattern to access SQLite
  
- [https://github.com/doublefx/easyWorker/tree/master/moreFlexDemo/BankAccount]
+ https://github.com/doublefx/easyWorker/tree/master/moreFlexDemo/BankAccount
  
  Simple Thread based application to demonstrate how to manage concurrent access to the same data
  
- [https://github.com/doublefx/easyWorker/tree/PureAS3/moreAS3Demo/MP3Worker]
+ https://github.com/doublefx/easyWorker/tree/PureAS3/moreAS3Demo/MP3Worker
  
- Thread based implementation of the original MP3Worker. [http://gotoandlearn.com/play.php?id=169] 
+ Thread based implementation of the original MP3Worker. http://gotoandlearn.com/play.php?id=169
  
  It runs a WAV->MP3 converter in a Thread
  
