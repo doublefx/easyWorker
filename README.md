@@ -222,8 +222,8 @@ web, desktop and mobile examples for Flex/AIR and pure AS3 project, The last one
  
  It runs a WAV->MP3 converter in a Thread
  
- Limitations:
- ----
+ Limitations :
+----
  
  You can't easily use big dependent Flex SDK classes in your worker, this is because:
  
