@@ -185,114 +185,8 @@ You can intercept a call to pause, resume and terminate from your Runnable, see:
      }
  }
  }
-```
 
-The IThread interface looks like that:
-
- ```ActionScript
- [Bindable]
- public interface IThread extends IEventDispatcher{
-
-     /**
-      * Start a Thread and call the Runnable's run method.
-      *
-      * @param args The arguments to pass to the Runnable's run method.
-      */
-     function start(...args):void;
-
-     /**
-      * Terminate Thread.
-      */
-     function terminate():void;
-
-     /**
-      * Pause a running Thread.
-      * All command send to the Thread will be delayed until resume has been called.
-      *
-      * @param milli Optional number of milliseconds to pause.
-      */
-     function pause(milli:Number = 0):void;
-
-     /**
-      * Resume a paused Thread.
-      */
-     function resume():void;
-
-     /**
-      * The Thread's id, should be the same than the one seen via FDB.
-      */
-     function get id():uint;
-
-     /**
-      * The Thread's name.
-      */
-     function get name():String;
-
-     /**
-      * @see com.doublefx.as3.thread.ThreadState
-      */
-     function get state():String;
-
-     /**
-      * Return true if the Thread is new.
-      */
-     function get isNew():Boolean;
-
-     /**
-      * Return true if the Thread is running.
-      */
-     function get isRunning():Boolean;
-
-     /**
-      * Return true if the Thread is paused.
-      */
-     function get isPaused():Boolean;
-
-     /**
-      * Return true if the Thread is terminated.
-      */
-     function get isTerminated():Boolean;
-
-     /**
-      * Because the start, pause, resume and terminate function are asynchronous,
-      * return true when the relative function is call but not yet completed,
-      * return false when done (not Bindable).
-      */
-     function get isStarting():Boolean;
-
-
-     /**
-      * Because the start, pause, resume and terminate function are asynchronous,
-      * return true when the relative function is call but not yet completed,
-      * return false when done (not Bindable).
-      */
-     function get isPausing():Boolean;
-
-
-     /**
-      * Because the start, pause, resume and terminate function are asynchronous,
-      * return true when the relative function is call but not yet completed,
-      * return false when done (not Bindable).
-      */
-     function get isResuming():Boolean;
-
-
-     /**
-      * Because the start, pause, resume and terminate function are asynchronous,
-      * return true when the relative function is call but not yet completed,
-      * return false when done (not Bindable).
-      */
-     function get isTerminating():Boolean;
- }
-```
-
-Note: This is an early stage version, many things have to come:
-
-- More to come to interact with your Runnable from the Thread.
-
-The [Issues] [1] is a good place to ask things and raise issues indeed.
-
-How to build it:
+How to build it ?
 ----
 
 This project has a Maven structure but is not mavenized yet as the Apache Flex SDK is not at the moment, so, to build it, you will need to create a project based on those sources in your favorite IDE (I use IntelliJ).
@@ -302,10 +196,76 @@ This project is compatible with Apache Flex SDK 4.13 which has not been released
 Why this minimum requirement ? Because from this version, debugging Workers is possible using FDB or any IDE which use it such as IntelliJ, because Flash Player 11.5 is the first version that allows you to use Worker, Condition and Mutex.
 
 Also, I use the very well done [as3-commons-reflect] [5] and [as3swf] [3] libs to reflect and emit the Worker and its dependencies in memory, FlexUnit 4.1 for the tests.
-Those libs can be found [here] [4].
+
+Examples :
+----
+
+You will find in the sub-directory of the Master and PureAS3 project, some 
+web, desktop and mobile examples for Flex/AIR and pure AS3 project, The last ones :
+ 
+ [https://github.com/doublefx/easyWorker/tree/master/moreFlexDemo/downloadFileThread-Demo]
+ 
+ A thread based implementation of a simple tool to download / copy files running in a Thread, with persistent pause / resume capabilities and automatic re-download if the file has changed on the server after a long pause.
+ 
+ [https://github.com/doublefx/easyWorker-ActiveAIRCord}
+  
+ Requested by the creator of ActiveAIRCord [https://github.com/riadvice/ActiveAIRCord] , An easy to use library using the Active Record pattern to access SQLite
+ 
+ [https://github.com/doublefx/easyWorker/tree/master/moreFlexDemo/BankAccount]
+ 
+ Simple Thread based application to demonstrate how to manage concurrent access to the same data
+ 
+ [https://github.com/doublefx/easyWorker/tree/PureAS3/moreAS3Demo/MP3Worker]
+ 
+ Thread based implementation of the original MP3Worker. [http://gotoandlearn.com/play.php?id=169] 
+ 
+ It runs a WAV->MP3 converter in a Thread
+ 
+ Limitations:
+ ----
+ 
+ You can't easily use big dependent Flex SDK classes in your worker, this is because:
+ 
+ 1- The Adobe worker limitation itself:
+ 
+ "Several runtime APIs are not available in code running in a background worker. 
+ These primarily consist of APIs related to user input and output mechanisms, or operating system elements like windows and dragging. 
+ As a rule, for any API that isn't supported in all contexts, use the isSupported, available, and similar properties to check whether 
+ the API is available in the background worker context before attempting to use the API.
+ 
+ Workers are useful because they decrease the chances of the frame rate dropping due to the main rendering thread being blocked 
+ by other code. However, workers require additional system memory and CPU use, which can be costly to overall application performance. 
+ Because each worker uses its own instance of the runtime virtual machine, even the overhead of a trivial worker can be large. 
+ When using workers, test your code across all your target platforms to ensure that the demands on the system are not too large. 
+ Adobe recommends that you do not use more than one or two background workers in a typical scenario."
+ 
+ ANE's are not supported either.
+ 
+ 2- Limitations relative to the Flex SDK class dependencies.
+ 
+ Well, it is not a technical limitation, it is simply not a good practice to use classes such as ArrayCollection (which has tons of dependencies) in your worker, better to use Array for example.
+ 
+ easyWorker will detect and import in your in-memory worker each Type it will meet in non private instance or static methods, properties and variables that has been used in your Runnable.
+ For those private, use extraDependency from the Thread constructor.
+
+Enjoy and don't hesitate to give me your feedback.
+
+Bug tracker
+----
+
+Have a bug, a question? Please create an issue [here on GitHub] [1]
+
+Disclaimer, Copyright and license
+----
 
 This library is inspired by [worker-from-class] [6] and [Developer-friendly AS Workers API] [7]
 
+Copyright 2014 Frédéric Thomas. Released under Apache 2.0.
+
+
+Follow me on twitter [@webdoublefx] [10]
+ 
+ 
 [1]:https://github.com/doublefx/easyWorker/issues
 [2]:http://flex.apache.org/installer.html
 [3]:https://github.com/claus/as3swf
@@ -316,6 +276,3 @@ This library is inspired by [worker-from-class] [6] and [Developer-friendly AS W
 [8]:http://www.sharebeast.com/c18uwjjf532s
 [9]:https://github.com/doublefx/easyWorker/tree/PureAS3
 [10]:https://twitter.com/webDoubleFx
-
-Enjoy and don't hesitate to give me your feedback.
-[Follow me on tweeter] [10]
