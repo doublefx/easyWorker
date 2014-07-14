@@ -201,8 +201,8 @@ Also, I use the very well done [as3-commons-reflect] [5] and [as3swf] [3] libs t
 Examples :
 ----
 
-You will find in the sub-directory of the Master and PureAS3 project, some 
-web, desktop and mobile examples for Flex/AIR and pure AS3 project, The last ones :
+You will find in the sub-directory of the Master and PureAS3 branches, some 
+web, desktop and mobile examples for Flex/AIR and pure AS3 project, the last ones :
  
  https://github.com/doublefx/easyWorker/tree/master/moreFlexDemo/downloadFileThread-Demo
  
