@@ -12,7 +12,7 @@
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="Apache Flex 4.13.0 FP 13 AIR 13 fr_FR" />
+          <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
         <compiler-options />
         <packaging-air-desktop use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/desktop-app.xml" package-file-name="easyWorkerDesktopDemo" />
@@ -29,7 +29,7 @@
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="Apache Flex 4.13.0 FP 13 AIR 13 fr_FR" />
+          <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
         <compiler-options />
         <packaging-air-desktop />
@@ -37,7 +37,7 @@
         <packaging-ios use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/mobile-app.xml" package-file-name="easyWorkerMobileDemo" />
       </configuration>
       <configuration name="WebDemo" pure-as="true" main-class="Web" output-file="WebDemo.swf" output-folder="$MODULE_DIR$/../out/production/AS3Demo" use-html-wrapper="true" wrapper-template-path="$MODULE_DIR$/html-template">
-        <dependencies target-player="13.0">
+        <dependencies target-player="14.0">
           <entries>
             <entry library-name="feathers" library-level="project">
               <dependency linkage="Merged" />
@@ -46,7 +46,7 @@
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="Apache Flex 4.13.0 FP 13 AIR 13 fr_FR" />
+          <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
         <compiler-options />
         <packaging-air-desktop />
@@ -61,7 +61,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Apache Flex 4.13.0 FP 13 AIR 13 fr_FR" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="Apache Flex 4.13.0 FP 14 AIR 14 en_US" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="API" exported="" />
     <orderEntry type="library" exported="" name="feathers" level="project" />
