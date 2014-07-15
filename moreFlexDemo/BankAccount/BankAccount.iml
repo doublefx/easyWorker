@@ -2,17 +2,17 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="BankAccountDesktop">
     <configurations>
-      <configuration name="BankAccountDesktop" target-platform="Desktop" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/../../out/production/BankAccount">
+      <configuration name="BankAccountDesktop" target-platform="Desktop" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/../../out/production/BankAccount" skip-build="true">
         <dependencies>
           <entries>
             <entry module-name="API" build-configuration-name="easyWorker">
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="Apache Flex 4.13.0 FP 13 AIR 13 fr_FR" />
+          <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
         <compiler-options />
-        <packaging-air-desktop package-file-name="BankAccountMobile" />
+        <packaging-air-desktop custom-descriptor-path="$MODULE_DIR$/Main-app.xml" package-file-name="BankAccountMobile" />
         <packaging-android />
         <packaging-ios />
       </configuration>
@@ -24,7 +24,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Apache Flex 4.13.0 FP 13 AIR 13 fr_FR" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="Apache Flex 4.13.0 FP 14 AIR 14 en_US" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="API" exported="" />
   </component>
