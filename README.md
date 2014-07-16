@@ -187,6 +187,8 @@ You can intercept a call to pause, resume and terminate from your Runnable, see:
  }
 ```
 
+NOTE: You should compile your swf with -optimize=false
+
 How to build it ?
 ----
 
