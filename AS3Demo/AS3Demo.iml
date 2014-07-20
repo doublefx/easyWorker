@@ -14,7 +14,9 @@
           </entries>
           <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
-        <compiler-options />
+        <compiler-options>
+          <option name="additionalOptions" value="-optimize=false" />
+        </compiler-options>
         <packaging-air-desktop use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/desktop-app.xml" package-file-name="easyWorkerDesktopDemo" />
         <packaging-android />
         <packaging-ios />
@@ -31,7 +33,9 @@
           </entries>
           <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
-        <compiler-options />
+        <compiler-options>
+          <option name="additionalOptions" value="-optimize=false" />
+        </compiler-options>
         <packaging-air-desktop />
         <packaging-android enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/mobile-app.xml" package-file-name="easyWorkerMobileDemo" />
         <packaging-ios use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/mobile-app.xml" package-file-name="easyWorkerMobileDemo" />
@@ -48,7 +52,9 @@
           </entries>
           <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
-        <compiler-options />
+        <compiler-options>
+          <option name="additionalOptions" value="-optimize=false" />
+        </compiler-options>
         <packaging-air-desktop />
         <packaging-android />
         <packaging-ios />
