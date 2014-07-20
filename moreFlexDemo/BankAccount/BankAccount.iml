@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="BankAccountDesktop">
     <configurations>
-      <configuration name="BankAccountDesktop" target-platform="Desktop" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/../../out/production/BankAccount" skip-build="true">
+      <configuration name="BankAccountDesktop" target-platform="Desktop" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/../../out/production/BankAccount">
         <dependencies>
           <entries>
             <entry module-name="API" build-configuration-name="easyWorker">
@@ -11,8 +11,13 @@
           </entries>
           <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
-        <compiler-options />
-        <packaging-air-desktop custom-descriptor-path="$MODULE_DIR$/Main-app.xml" package-file-name="BankAccountMobile" />
+        <compiler-options>
+          <map>
+            <entry key="compiler.debug.swf" value="false" />
+          </map>
+          <option name="additionalOptions" value="-optimize=true" />
+        </compiler-options>
+        <packaging-air-desktop custom-descriptor-path="$MODULE_DIR$/Main-app.xml" package-file-name="BankAccount" />
         <packaging-android />
         <packaging-ios />
       </configuration>

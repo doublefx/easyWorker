@@ -89,7 +89,7 @@ public class WorkerFactory {
                     for each (var depAbcName:String in dependencies) {
                         if (tagDoABC.abcName == depAbcName.replace(/\./g, "/")) {
                             abcTags.push(tag);
-                            //trace("Dep: " + depAbcName);
+                            trace("Dep: " + depAbcName +" tag: " + tag.toString(0, 0x01));
                             break;
                         }
                     }
@@ -114,7 +114,7 @@ public class WorkerFactory {
             swf.compressed = compression;
 
             swf.tags.push(new TagFileAttributes());
-            if (debug) swf.tags.push(debugTag);
+            if (debug && debugTag) swf.tags.push(debugTag);
             if (bgColorTag)
                 swf.tags.push(bgColorTag);
             if (metaTag)
