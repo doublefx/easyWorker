@@ -30,9 +30,7 @@ import flash.system.WorkerState;
 
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
-import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertNotNull;
-import org.flexunit.asserts.assertTrue;
 import org.flexunit.asserts.fail;
 import org.flexunit.async.Async;
 
@@ -64,7 +62,9 @@ public class SimpleThreadTestWithNoArgs extends ThreadTestBase {
 
     [Test(description="Verify dependencies content")]
     public function testDependenciesContent():void {
-        const dependencies:Array = ["mx.core.DebuggableWorker","com.doublefx.as3.thread.api.CrossThreadDispatcher","com.doublefx.as3.thread.api.IWorker","workers.SimpleWorkerWithNoArgs","com.doublefx.as3.thread.api.Runnable","com.doublefx.as3.thread.util.Closure","com.doublefx.as3.thread.util.DecodedMessage","com.doublefx.as3.thread.event.ThreadFaultEvent","com.doublefx.as3.thread.event.ThreadResultEvent","com.doublefx.as3.thread.event.ThreadProgressEvent","com.doublefx.as3.thread.event.ThreadActionRequestEvent","com.doublefx.as3.thread.event.ThreadActionResponseEvent","com.doublefx.as3.thread.error.NotImplementedRunnableError","com.doublefx.as3.thread.util.ClassAlias"];
+        const dependencies:Vector.<String> = Vector.<String>(
+                ["mx.core.DebuggableWorker", "com.doublefx.as3.thread.api.CrossThreadDispatcher", "com.doublefx.as3.thread.api.IWorker", "workers.SimpleWorkerWithNoArgs", "com.doublefx.as3.thread.api.Runnable", "com.doublefx.as3.thread.util.Closure", "com.doublefx.as3.thread.util.DecodedMessage", "com.doublefx.as3.thread.event.ThreadFaultEvent", "com.doublefx.as3.thread.event.ThreadResultEvent", "com.doublefx.as3.thread.event.ThreadProgressEvent", "com.doublefx.as3.thread.event.ThreadActionRequestEvent", "com.doublefx.as3.thread.event.ThreadActionResponseEvent", "com.doublefx.as3.thread.error.NotImplementedRunnableError", "com.doublefx.as3.thread.util.ClassAlias"]
+        );
 
         assertThat(Thread(_thread).collectedDependencies, arrayExact(dependencies));
     }

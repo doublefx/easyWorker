@@ -22,17 +22,11 @@
  */
 package com.doublefx.as3.thread {
 import com.doublefx.as3.test.matcher.ArrayExactMatcher;
-import com.doublefx.as3.thread.Thread;
-import com.doublefx.as3.thread.Thread;
+import com.doublefx.as3.test.matcher.VectorStringExactMatcher;
 import com.doublefx.as3.thread.api.IThread;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;
 
 import flash.display.LoaderInfo;
-
-import flash.display.LoaderInfo;
-import flash.system.ApplicationDomain;
-
-import flash.system.WorkerState;
 
 import mx.core.FlexGlobals;
 
@@ -42,7 +36,6 @@ import org.flexunit.asserts.assertNotNull;
 import org.flexunit.asserts.assertNull;
 import org.flexunit.asserts.assertTrue;
 import org.hamcrest.Matcher;
-import org.hamcrest.assertThat;
 
 use namespace thread_diagnostic;
 
@@ -67,49 +60,49 @@ public class ThreadTestBase {
         _thread.terminate();
     }
 
-    [Test (description="The Thread should have been created")]
+    [Test(description="The Thread should have been created")]
     public function testThreadHasBeenCreated():void {
         assertNotNull("Should not be null", _thread);
     }
 
-    [Test (description="Verify the ID")]
+    [Test(description="Verify the ID")]
     public function testId():void {
         assertTrue("Should be > 1", _thread.id > 0);
     }
 
-    [Test (description="Verify the name of the Thread")]
+    [Test(description="Verify the name of the Thread")]
     public function testName():void {
         assertNull("Should be null", _thread.name);
     }
 
-    [Test (description="Verify the state of the Thread before the start method has been called")]
+    [Test(description="Verify the state of the Thread before the start method has been called")]
     public function testStateBeforeStart():void {
         testStateNew();
     }
 
-    [Test (description="Verify dependencies")]
+    [Test(description="Verify dependencies")]
     public function testDependenciesExistence():void {
-        assertNull("Should be null" ,Thread(_thread).collectedDependencies);
+        assertNull("Should be null", Thread(_thread).collectedDependencies);
     }
 
-    [Test (description="Verify the Runnable class name")]
+    [Test(description="Verify the Runnable class name")]
     public function testRunnableClassName():void {
-        assertNull("Should be null" ,Thread(_thread).runnableClassName);
+        assertNull("Should be null", Thread(_thread).runnableClassName);
     }
 
-    [Test (description="Verify the Worker has been created")]
+    [Test(description="Verify the Worker has been created")]
     public function testWorkerExistence():void {
-        assertNull("Should be null" ,Thread(_thread).worker);
+        assertNull("Should be null", Thread(_thread).worker);
     }
 
-    [Test (description="Verify the incoming message channel has been created")]
+    [Test(description="Verify the incoming message channel has been created")]
     public function testIncomingMessageChannelExistence():void {
-        assertNull("Should be null" ,Thread(_thread).incomingChannel);
+        assertNull("Should be null", Thread(_thread).incomingChannel);
     }
 
-    [Test (description="Verify the outgoing message channel has been created")]
+    [Test(description="Verify the outgoing message channel has been created")]
     public function testOutgoingMessageChannelExistence():void {
-        assertNull("Should be null" ,Thread(_thread).outgoingChannel);
+        assertNull("Should be null", Thread(_thread).outgoingChannel);
     }
 
     protected function testStateNew():void {
@@ -156,11 +149,10 @@ public class ThreadTestBase {
     }
 
     /**
-     * Shorthand hamcrest function style of the ArrayExactMatcher.
+     * Shorthand hamcrest function style of the VectorStringExactMatcher.
      */
-    protected static function arrayExact(items:Array) : Matcher
-    {
-        return new ArrayExactMatcher(items);
+    protected static function arrayExact(items:Vector.<String>):Matcher {
+        return new VectorStringExactMatcher(items);
     }
 
 }
