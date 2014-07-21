@@ -96,7 +96,7 @@ public class Thread extends EventDispatcher implements IThread {
 
     private var _callLater:Array;
 
-    private var _collectedDependencies:Array;
+    private var _collectedDependencies:Vector.<String>;
     private var _collectedAliasesToRegister:Vector.<ClassAlias>;
     private var _workerReady:Boolean;
 
@@ -183,7 +183,7 @@ public class Thread extends EventDispatcher implements IThread {
 
                     reflect(loaderInfo.applicationDomain, extraDependencies);
 
-                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo.bytes, ThreadRunner, _collectedDependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
+                    _worker = WorkerFactory.getWorkerFromClass(loaderInfo, ThreadRunner, _collectedDependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
                     _worker.setSharedProperty("com.doublefx.as3.thread.name", _name);
                     _worker.setSharedProperty("com.doublefx.as3.thread.id", _id);
@@ -273,7 +273,7 @@ public class Thread extends EventDispatcher implements IThread {
         _collectedDependencies = ThreadDependencyHelper.collectDependencies(threadRunnerType);
 
         const runnableType:Type = Type.forName(_runnableClassName, domain);
-        const runnableDependencies:Array = ThreadDependencyHelper.collectDependencies(runnableType);
+        const runnableDependencies:Vector.<String> = ThreadDependencyHelper.collectDependencies(runnableType);
 
         if (runnableDependencies.length > 0)
             for each (className in runnableDependencies) {
@@ -296,7 +296,7 @@ public class Thread extends EventDispatcher implements IThread {
                 if (className) {
                     try {
                         const classType:Type = Type.forName(className, domain);
-                        const collectExtraDependencies:Array = ThreadDependencyHelper.collectDependencies(classType);
+                        const collectExtraDependencies:Vector.<String> = ThreadDependencyHelper.collectDependencies(classType);
                         for each (var dependencyName:String in collectExtraDependencies) {
                             dependencyName = ClassUtils.convertFullyQualifiedName(dependencyName);
                             if (dependencyName.indexOf("com.doublefx.as3.thread.") != 0) {
@@ -479,7 +479,7 @@ public class Thread extends EventDispatcher implements IThread {
         return _runnableClassName;
     }
 
-    thread_diagnostic function get collectedDependencies():Array {
+    thread_diagnostic function get collectedDependencies():Vector.<String> {
         return _collectedDependencies;
     }
 

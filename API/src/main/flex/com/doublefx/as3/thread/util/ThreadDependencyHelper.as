@@ -79,9 +79,9 @@ public class ThreadDependencyHelper {
     // END: Copied from org.as3commons.bytecode.reflect.ByteCodeType
 
 
-    public static function collectDependencies(codeType:Type, returnArray:Array = null):Array {
+    public static function collectDependencies(codeType:Type, returnArray:Vector.<String> = null):Vector.<String> {
         if (!returnArray)
-            returnArray = [];
+            returnArray = new Vector.<String>();
 
         if (codeType && isValidTypeName(codeType.fullName)) {
 
@@ -140,7 +140,7 @@ public class ThreadDependencyHelper {
                 for each (var method:Method in codeType.methods) {
                     const returnTypeName:String = method.returnTypeName;
                     if (isValidTypeName(returnTypeName)) {
-                        const returnType:Type = method.returnType ;
+                        const returnType:Type = method.returnType;
                         fullName = getFullName(returnType, method.returnTypeName);
                         if (fullName)
                             collectDependencies(Type.forName(fullName, returnType ? returnType.applicationDomain : null), returnArray);
@@ -153,6 +153,13 @@ public class ThreadDependencyHelper {
                                 collectDependencies(Type.forName(parameterType.fullName, parameterType.applicationDomain), returnArray);
                             }
                         }
+                    }
+                }
+
+                const embeds:Array = collectEmbeds(codeType);
+                for each (var embed:String in embeds) {
+                    if (isValidTypeName(embed)) {
+                        collectDependencies(Type.forName(embed, codeType.applicationDomain), returnArray);
                     }
                 }
             }
@@ -191,7 +198,34 @@ public class ThreadDependencyHelper {
         return null;
     }
 
-    private static function collectMembers(member:IMember, returnArray:Array):void {
+    /**
+     * Collect the Embeds.
+     * The best way I found to collect Embeds as I can't check for the metadata until I assume the dependencies from libraries won't be compile with -keep-as3-metadata+=Embed
+     * The compiler generate a class for the Embed starting with the qualified name of the class followed by "_".
+     *
+     * @param dependency
+     * @return
+     */
+    private static function collectEmbeds(dependency:Type):Array {
+        const more:Array = [];
+
+        const embedBase:String = dependency.fullName + "_";
+
+        const definitionNames:Vector.<String> = dependency.applicationDomain.getQualifiedDefinitionNames();
+
+        const embeds:Vector.<String> = definitionNames.filter(function (item:*, index:int, array:Vector.<String>):Boolean {
+            return (String(item).indexOf(embedBase) == 0)
+        });
+
+        if (embeds.length > 0)
+            for each (var definition:String in embeds) {
+                more[more.length] = definition;
+            }
+
+        return more;
+    }
+
+    private static function collectMembers(member:IMember, returnArray:Vector.<String>):void {
         const memberType:Type = member.type;
         if (memberType && isValidTypeName(memberType.fullName)) {
             collectDependencies(Type.forName(memberType.fullName, memberType.applicationDomain), returnArray);
@@ -205,7 +239,7 @@ public class ThreadDependencyHelper {
         return (!isNativeName(typeName));
     }
 
-    public static function addUniquely(item:Object, array:Array):Boolean {
+    public static function addUniquely(item:String, array:Vector.<String>):Boolean {
         if (item != null && array.indexOf(item) == -1) {
             array[array.length] = item;
             return true;
