@@ -85,8 +85,7 @@ public class WorkerFactory {
                     if (symbol.tagId == 0) {
                         symbol.name = className;
                         classTag = tag;
-                    } else if (dependencies.indexOf(symbol.name) == -1)
-                        swfSymbols.splice(s0--, 1);
+                    }
                 }
             }
             // Collect each dependent TagExportAssets and its symbols (embeds) removing the unused ones.
@@ -95,7 +94,7 @@ public class WorkerFactory {
                 swfSymbols = TagExportAssets(tag).symbols;
                 for (var s1:uint = 0; s1 < swfSymbols.length; s1++) {
                     symbol = swfSymbols[s1];
-                    if (dependencies.indexOf(symbol.name)) {
+                    if (dependencies.indexOf(symbol.name) > -1) {
                         exportAssets[exportAssets.length] = tag;
                     } else
                         swfSymbols.splice(s1--, 1);
@@ -131,7 +130,7 @@ public class WorkerFactory {
         }
 
         /**
-         * Collect the IDefinitionTag for each TagExportAssets symbol.
+         * Collect the IDefinitionTag for each TagExportAssets symbol and add the symbol to the main class.
          */
         for each (var assets:ITag in exportAssets) {
             if (assets is TagExportAssets)
@@ -142,6 +141,8 @@ public class WorkerFactory {
                             const characterId:uint = definitionTag.characterId;
                             if (swfSymbol.tagId == characterId) {
                                 definitionTags[definitionTags.length] = definitionTag;
+                                const classSymbols:Vector.<SWFSymbol> = TagSymbolClass(classTag).symbols;
+                                classSymbols[classSymbols.length] = swfSymbol;
                                 break;
                             }
                         }
