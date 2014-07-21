@@ -13,7 +13,7 @@
         </dependencies>
         <compiler-options>
           <map>
-            <entry key="compiler.debug.swf" value="false" />
+            <entry key="compiler.debug.swf" value="true" />
           </map>
           <option name="additionalOptions" value="-optimize=false" />
         </compiler-options>
