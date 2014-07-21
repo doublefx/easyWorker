@@ -22,14 +22,11 @@ import com.doublefx.as3.thread.Thread;
 import com.doublefx.as3.thread.api.IThread;
 import com.doublefx.as3.thread.event.ThreadProgressEvent;
 import com.doublefx.as3.thread.event.ThreadResultEvent;
-import com.doublefx.as3.thread.util.ClassAlias;
 
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.net.FileReference;
 import flash.net.FileReferenceList;
-
-import fr.kikko.lab.ShineMP3Encoder;
 
 import mx.core.DebuggableWorker;
 
