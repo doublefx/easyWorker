@@ -31,7 +31,7 @@ and you may need to set the Thread.DEFAULT_LOADER_INFO as described in the ASDoc
 The [Issues] [1] is a good place to ask things and raise issues indeed.
 
 [1]:https://github.com/doublefx/easyWorker/issues
-[8]:http://www.sharebeast.com/ojnpyiqgmgg8
+[8]:http://www.sharebeast.com/xp2eit0lig83
 [9]:https://github.com/doublefx/easyWorker
 
 Enjoy and don't hesitate to give me your feedback.
