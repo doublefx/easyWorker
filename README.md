@@ -276,6 +276,6 @@ Follow me on twitter [@webdoublefx] [10]
 [5]:http://www.as3commons.org/as3-commons-reflect/introduction.html
 [6]:https://github.com/bortsen/worker-from-class
 [7]:http://myappsnippet.com/developer-friendly-workers-api/
-[8]:http://www.sharebeast.com/c18uwjjf532s
+[8]:http://www.sharebeast.com/zt5oaz015d2f
 [9]:https://github.com/doublefx/easyWorker/tree/PureAS3
 [10]:https://twitter.com/webDoubleFx
