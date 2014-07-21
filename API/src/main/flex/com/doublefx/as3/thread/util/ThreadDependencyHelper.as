@@ -156,7 +156,7 @@ public class ThreadDependencyHelper {
                     }
                 }
 
-                const embeds:Array = collectEmbeds(codeType);
+                const embeds:Vector.<String> = collectEmbeds(codeType);
                 for each (var embed:String in embeds) {
                     if (isValidTypeName(embed)) {
                         collectDependencies(Type.forName(embed, codeType.applicationDomain), returnArray);
@@ -206,23 +206,16 @@ public class ThreadDependencyHelper {
      * @param dependency
      * @return
      */
-    private static function collectEmbeds(dependency:Type):Array {
-        const more:Array = [];
-
+    private static function collectEmbeds(dependency:Type):Vector.<String> {
         const embedBase:String = dependency.fullName + "_";
 
         const definitionNames:Vector.<String> = dependency.applicationDomain.getQualifiedDefinitionNames();
 
         const embeds:Vector.<String> = definitionNames.filter(function (item:*, index:int, array:Vector.<String>):Boolean {
-            return (String(item).indexOf(embedBase) == 0)
+            return (String(item).indexOf(embedBase) == 0);
         });
 
-        if (embeds.length > 0)
-            for each (var definition:String in embeds) {
-                more[more.length] = definition;
-            }
-
-        return more;
+        return embeds;
     }
 
     private static function collectMembers(member:IMember, returnArray:Vector.<String>):void {
