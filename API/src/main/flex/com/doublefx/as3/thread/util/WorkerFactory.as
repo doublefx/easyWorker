@@ -22,6 +22,7 @@ import com.codeazur.as3swf.SWF;
 import com.codeazur.as3swf.data.SWFSymbol;
 import com.codeazur.as3swf.tags.IDefinitionTag;
 import com.codeazur.as3swf.tags.ITag;
+import com.codeazur.as3swf.tags.TagDefineBinaryData;
 import com.codeazur.as3swf.tags.TagDoABC;
 import com.codeazur.as3swf.tags.TagEnableDebugger2;
 import com.codeazur.as3swf.tags.TagEnd;
@@ -64,7 +65,7 @@ public class WorkerFactory {
 
         var tag:ITag;
         var classTag:ITag;
-        var metaTags:Vector.<ITag> = new Vector.<ITag>();
+        var metaTag:ITag;
         var bgColorTag:ITag;
         var debugTag:ITag;
         var abcTags:Vector.<ITag> = new Vector.<ITag>();
@@ -72,19 +73,28 @@ public class WorkerFactory {
         var productInfo:ITag;
         var frameLabel:ITag;
         var definitionTags:Vector.<IDefinitionTag> = new Vector.<IDefinitionTag>();
-        var exportAssets:Vector.<ITag> = new Vector.<ITag>();
+        var definitionTag:IDefinitionTag;
+        var characterId:uint;
+        var exportAssets:Vector.<TagExportAssets> = new Vector.<TagExportAssets>();
+        var exportSymbols:Vector.<TagSymbolClass> = new Vector.<TagSymbolClass>();
         var swfSymbols:Vector.<SWFSymbol>;
+        var classSymbols:Vector.<SWFSymbol>;
         var symbol:SWFSymbol;
 
         for each (tag in tags) {
             if (tag is TagSymbolClass) {
-                // Collect the main class symbol.
-                swfSymbols = TagSymbolClass(tag).symbols;
+                // Collect the main class symbol and others.
+                const tagSymbolClass:TagSymbolClass = tag as TagSymbolClass;
+                swfSymbols = tagSymbolClass.symbols;
                 for (var s0:uint = 0; s0 < swfSymbols.length; s0++) {
                     symbol = swfSymbols[s0];
                     if (symbol.tagId == 0) {
                         symbol.name = className;
                         classTag = tag;
+                    } else if (dependencies.indexOf(symbol.name) > -1) {
+                        exportSymbols[exportSymbols.length] = tag as TagSymbolClass;
+                    } else {
+                        swfSymbols.splice(s0--, 1);
                     }
                 }
             }
@@ -95,7 +105,7 @@ public class WorkerFactory {
                 for (var s1:uint = 0; s1 < swfSymbols.length; s1++) {
                     symbol = swfSymbols[s1];
                     if (dependencies.indexOf(symbol.name) > -1) {
-                        exportAssets[exportAssets.length] = tag;
+                        exportAssets[exportAssets.length] = tag as TagExportAssets;
                     } else
                         swfSymbols.splice(s1--, 1);
                 }
@@ -118,7 +128,7 @@ public class WorkerFactory {
             } else if (tag is TagSetBackgroundColor) {
                 bgColorTag = tag;
             } else if (tag is TagMetadata) {
-                metaTags[metaTags.length] = tag;
+                metaTag = tag;
             } else if (tag is TagScriptLimits) {
                 scriptLimitTag = tag;
             } else if (tag is TagProductInfo) {
@@ -132,22 +142,38 @@ public class WorkerFactory {
         /**
          * Collect the IDefinitionTag for each TagExportAssets symbol and add the symbol to the main class.
          */
-        for each (var assets:ITag in exportAssets) {
-            if (assets is TagExportAssets)
-                for each (var swfSymbol:SWFSymbol in TagExportAssets(assets).symbols) {
-                    for each (tag in tags) {
-                        if (tag is IDefinitionTag) {
-                            const definitionTag:IDefinitionTag = tag as IDefinitionTag;
-                            const characterId:uint = definitionTag.characterId;
-                            if (swfSymbol.tagId == characterId) {
-                                definitionTags[definitionTags.length] = definitionTag;
-                                const classSymbols:Vector.<SWFSymbol> = TagSymbolClass(classTag).symbols;
-                                classSymbols[classSymbols.length] = swfSymbol;
-                                break;
-                            }
+        for each (var assets:TagExportAssets in exportAssets) {
+            for each (var swfSymbol:SWFSymbol in assets.symbols) {
+                for each (tag in tags) {
+                    if (tag is IDefinitionTag) {
+                        definitionTag = tag as IDefinitionTag;
+                        characterId = definitionTag.characterId;
+                        if (swfSymbol.tagId == definitionTag.characterId) {
+                            definitionTags[definitionTags.length] = tag as IDefinitionTag;
+                            classSymbols = TagSymbolClass(classTag).symbols;
+                            addUniquely(classSymbols, swfSymbol);
+                            break;
                         }
                     }
                 }
+            }
+        }
+
+        for each (var symbolClass:TagSymbolClass in exportSymbols) {
+            for each (swfSymbol in symbolClass.symbols) {
+                for each (tag in tags) {
+                    if (tag is TagDefineBinaryData) {
+                        definitionTag = tag as IDefinitionTag;
+                        characterId = definitionTag.characterId;
+                        if (swfSymbol.tagId == characterId) {
+                            definitionTags[definitionTags.length] = definitionTag;
+                            classSymbols = TagSymbolClass(classTag).symbols;
+                            addUniquely(classSymbols, swfSymbol);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         if (classTag) {
@@ -158,14 +184,14 @@ public class WorkerFactory {
             swf.compressed = compression;
 
             const tagFileAttributes:TagFileAttributes = new TagFileAttributes();
-            tagFileAttributes.hasMetadata = metaTags.length > 0;
+            tagFileAttributes.hasMetadata = metaTag != null;
             swf.tags.push(tagFileAttributes);
             if (debug && debugTag)
                 swf.tags.push(debugTag);
             if (bgColorTag)
                 swf.tags.push(bgColorTag);
-            for (i = 0; i < metaTags.length; i++) {
-                swf.tags.push(metaTags[i]);
+            if (metaTag) {
+                swf.tags.push(metaTag);
             }
             for (i = 0; i < definitionTags.length; i++) {
                 swf.tags.push(definitionTags[i]);
@@ -201,6 +227,15 @@ public class WorkerFactory {
         }
 
         return null;
+    }
+
+    private static function addUniquely(classSymbols:Vector.<SWFSymbol>, swfSymbol:SWFSymbol):void {
+        for each (var symbol:SWFSymbol in classSymbols) {
+            if (symbol.tagId == swfSymbol.tagId && symbol.name == swfSymbol.name) {
+                return;
+            }
+        }
+        classSymbols[classSymbols.length] = swfSymbol;
     }
 
     private static function getLabelFromClass(className:String):String {
