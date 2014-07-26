@@ -56,7 +56,7 @@ public class VectorStringExactMatcher extends BaseMatcher {
      * @inheritDoc
      */
     override public function describeTo(description:Description):void {
-        description.appendText("an vector with exactly the same values. ")
+        description.appendText("a vector with exactly the same values. ")
                 .appendValue(_items);
     }
 }

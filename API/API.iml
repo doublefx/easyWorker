@@ -11,6 +11,9 @@
             <entry library-name="as3commons-reflect" library-level="project">
               <dependency linkage="Merged" />
             </entry>
+            <entry library-id="ec62c943-50c5-4004-9f73-69f6e1770a98">
+              <dependency linkage="Test" />
+            </entry>
           </entries>
           <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
         </dependencies>
@@ -37,6 +40,16 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="flexunit-4.1.0-flex4" level="project" />
     <orderEntry type="library" exported="" name="as3commons-reflect" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="ec62c943-50c5-4004-9f73-69f6e1770a98" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/helloWorldForTests.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

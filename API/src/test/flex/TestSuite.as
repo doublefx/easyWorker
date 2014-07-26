@@ -27,6 +27,9 @@ import com.doublefx.as3.thread.SimpleThreadTestWithNoArgs;
 import com.doublefx.as3.thread.SimpleThreadTestWithOneArgs;
 import com.doublefx.as3.thread.SimpleThreadTestWithTwoArgs;
 import com.doublefx.as3.thread.ThreadTestBase;
+import com.doublefx.as3.thread.ThreadUsingEmbedsFromLibTest;
+import com.doublefx.as3.thread.ThreadUsingEmbedsTest;
+import com.doublefx.as3.thread.ThreadWithEmbedsTest;
 
 [Suite]
 [RunWith("org.flexunit.runners.Suite")]
@@ -40,5 +43,9 @@ public class TestSuite {
     public var complexThreadTest:ComplexThreadTest;
 
     public var simpleThreadTestStates:SimpleThreadTestStates;
+
+    public var threadWithEmbeds:ThreadWithEmbedsTest;
+    public var threadUsingEmbedsTest:ThreadUsingEmbedsTest;
+    public var threadUsingEmbedsFromLibTest:ThreadUsingEmbedsFromLibTest;
 }
 }
