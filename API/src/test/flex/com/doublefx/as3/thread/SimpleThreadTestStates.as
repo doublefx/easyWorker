@@ -30,7 +30,6 @@ import flash.events.IEventDispatcher;
 import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertTrue;
 import org.flexunit.async.Async;
-
 import org.fluint.sequence.SequenceCaller;
 import org.fluint.sequence.SequenceRunner;
 import org.fluint.sequence.SequenceWaiter;

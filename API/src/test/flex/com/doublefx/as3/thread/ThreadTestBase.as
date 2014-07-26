@@ -21,7 +21,6 @@
  * User: Frederic THOMAS Date: 16/06/2014 Time: 01:19
  */
 package com.doublefx.as3.thread {
-import com.doublefx.as3.test.matcher.ArrayExactMatcher;
 import com.doublefx.as3.test.matcher.VectorStringExactMatcher;
 import com.doublefx.as3.thread.api.IThread;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;

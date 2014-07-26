@@ -23,7 +23,6 @@
 package com.doublefx.as3.thread.api {
 
 import flash.events.Event;
-
 import flash.events.IEventDispatcher;
 
 /**

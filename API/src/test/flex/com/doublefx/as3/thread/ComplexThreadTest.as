@@ -24,13 +24,13 @@ package com.doublefx.as3.thread {
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
 import com.doublefx.as3.thread.event.ThreadResultEvent;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;
-import com.doublefx.as3.thread.util.ClassAlias;
-import workers.*;
-import workers.vo.TermsVo;
 
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.async.Async;
 import org.hamcrest.assertThat;
+
+import workers.*;
+import workers.vo.TermsVo;
 
 use namespace thread_diagnostic;
 

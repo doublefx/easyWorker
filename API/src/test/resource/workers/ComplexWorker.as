@@ -20,6 +20,7 @@
 package workers {
 import com.doublefx.as3.thread.api.CrossThreadDispatcher;
 import com.doublefx.as3.thread.api.Runnable;
+
 import workers.vo.TermsVo;
 
 // Don't need to extend Sprite anymore.
