@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<!--
+  - Copyright (c) 2014 Frédéric Thomas
+  -
+  - Licensed to the Apache Software Foundation (ASF) under one or more
+  - contributor license agreements.  See the NOTICE file distributed with
+  - this work for additional information regarding copyright ownership.
+  - The ASF licenses this file to You under the Apache License, Version 2.0
+  - (the "License"); you may not use this file except in compliance with
+  - the License.  You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+               applicationComplete="applicationCompleteHandler(event)">
+    <fx:Script><![CDATA[
+        import com.doublefx.as3.thread.Thread;
+        import com.doublefx.as3.thread.api.IThread;
+        import com.doublefx.as3.thread.event.ThreadResultEvent;
+
+        import flash.concurrent.Condition;
+
+        import mx.events.FlexEvent;
+
+        /** 128 megabytes */
+        private static const SIZE:uint = 1024 * 1024 * 128;
+
+        private var _thread:IThread;
+        private var _bytes:ByteArray;
+
+        private function applicationCompleteHandler(event:FlexEvent):void {
+            _thread = new Thread(CompressRunnable, "myCompressRunnable") as IThread;
+            _thread.addEventListener(ThreadResultEvent.RESULT, onResult);
+            _thread.start();
+        }
+
+        private function btn_clickHandler(event:MouseEvent):void {
+            // Get the condition the worker created for us
+            const condition:Condition = _thread.getSharedProperty("condition");
+
+            // Try to take ownership of the condition mutex
+            // During this phase, don't call any Thread methods as the Thread is waiting
+            // for data and in a loop, and therefore not available.
+            if (condition.mutex.tryLock()) {
+                // Create a big ByteArray for the worker to compress
+                _bytes = new ByteArray();
+                _bytes.length = SIZE;
+                _bytes.shareable = true;
+                _thread.setSharedProperty("bytes", _bytes);
+
+                // Clear the status text displays
+                errorMessage.text = "";
+                logger.text = "";
+
+                // The worker is waiting, so we got the lock. Notify the worker
+                // that the bytes are ready and release our ownership of the
+                // mutex since we only needed it to notify.
+                condition.notify();
+                condition.mutex.unlock();
+
+                // Check if the worker is done.
+                // This demonstrates
+                // that the main worker thread is not blocked while the worker
+                // thread compresses the bytes.
+                addEventListener(Event.ENTER_FRAME, onEnterFrame);
+            }
+            else {
+                // The worker is not waiting, so show an error message
+                // indicating that it's too busy for a new request
+                errorMessage.text = "Error: worker busy at " + getTimer();
+            }
+        }
+
+        private function onEnterFrame(ev:Event):void {
+            // We did not get the mutex. This indicates that the compression
+            // is not yet complete. Show a message indicating that.
+            logger.text = "Compressing. Time: " + getTimer();
+        }
+
+        private function onResult(event:ThreadResultEvent):void {
+            // The message indicates that the compression is complete, so stop
+            // checking every frame.
+            removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+
+            // Output some statistics about the work that was done
+            logger.text = "Done compressing " + SIZE + " bytes to "
+            + _bytes.length + " bytes ("
+            + ((_bytes.length * 100.0) / SIZE).toFixed(2) + "%)";
+        }
+
+        private function onMouseRoll(event:MouseEvent):void {
+            if (event.type == MouseEvent.MOUSE_OVER) {
+                event.target.styleName = "clickableOver";
+            } else {
+                event.target.styleName = "clickable";
+            }
+        }
+        ]]></fx:Script>
+
+    <fx:Style>
+        #link {
+            skinClass: "mx.skins.spark.LinkButtonSkin";
+            color: black;
+            rollOverColor: blue;
+            textDecoration: underline;
+        }
+    </fx:Style>
+
+    <s:VGroup height="70%" paddingTop="10">
+        <s:Label width="500" color="0x323232"
+                 text="Demo of uses for the Condition class. Uses a Thread to compress a big ByteArray without blocking the main (UI) worker thread.
+This demonstrate as well how to feed a Thread with data, the Thread is waiting for the data shared with another Thread.
+This is the Thread implementation based on the Jackson Dunstan (JacksonDunstan.com) Demo"
+                 x="440" y="10"/>
+        <s:Label id="link" click="navigateToURL(new URLRequest('http://jacksondunstan.com/articles/2459'))"
+                 text="http://jacksondunstan.com/articles/2459"/>
+        <s:Label id="logger" height="25%" width="100%" fontFamily="_sans" fontSize="11"/>
+        <s:Button label="compress" click="btn_clickHandler(event)"/>
+        <s:Label id="errorMessage" height="25%" width="100%" fontFamily="_sans" fontSize="11" color="red"/>
+    </s:VGroup>
+</s:Application>
