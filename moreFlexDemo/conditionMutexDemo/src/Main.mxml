@@ -36,20 +36,21 @@
         private var _bytes:ByteArray;
 
         private function applicationCompleteHandler(event:FlexEvent):void {
+            // Create and start a new Thread as now the loaderInfo filled.
             _thread = new Thread(CompressRunnable, "myCompressRunnable") as IThread;
             _thread.addEventListener(ThreadResultEvent.RESULT, onResult);
             _thread.start();
         }
 
         private function btn_clickHandler(event:MouseEvent):void {
-            // Get the condition the worker created for us
+            // Get the condition the thread created for us
             const condition:Condition = _thread.getSharedProperty("condition");
 
             // Try to take ownership of the condition mutex
-            // During this phase, don't call any Thread methods as the Thread is waiting
+            // During this phase, the Thread is waiting
             // for data and in a loop, and therefore not available.
             if (condition.mutex.tryLock()) {
-                // Create a big ByteArray for the worker to compress
+                // Create a big ByteArray for the thread to compress
                 _bytes = new ByteArray();
                 _bytes.length = SIZE;
                 _bytes.shareable = true;
@@ -59,22 +60,21 @@
                 errorMessage.text = "";
                 logger.text = "";
 
-                // The worker is waiting, so we got the lock. Notify the worker
+                // The thread is waiting, so we got the lock. Notify the thread
                 // that the bytes are ready and release our ownership of the
                 // mutex since we only needed it to notify.
                 condition.notify();
                 condition.mutex.unlock();
 
-                // Check if the worker is done.
                 // This demonstrates
-                // that the main worker thread is not blocked while the worker
+                // that the main thread is not blocked while the client
                 // thread compresses the bytes.
                 addEventListener(Event.ENTER_FRAME, onEnterFrame);
             }
             else {
-                // The worker is not waiting, so show an error message
+                // The thread is not waiting, so show an error message
                 // indicating that it's too busy for a new request
-                errorMessage.text = "Error: worker busy at " + getTimer();
+                errorMessage.text = "Error: thread busy at " + getTimer();
             }
         }
 
@@ -93,14 +93,6 @@
             logger.text = "Done compressing " + SIZE + " bytes to "
             + _bytes.length + " bytes ("
             + ((_bytes.length * 100.0) / SIZE).toFixed(2) + "%)";
-        }
-
-        private function onMouseRoll(event:MouseEvent):void {
-            if (event.type == MouseEvent.MOUSE_OVER) {
-                event.target.styleName = "clickableOver";
-            } else {
-                event.target.styleName = "clickable";
-            }
         }
         ]]></fx:Script>
 
