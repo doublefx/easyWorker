@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/API/API.iml" filepath="$PROJECT_DIR$/API/API.iml" />
       <module fileurl="file://$PROJECT_DIR$/moreFlexDemo/BankAccount/BankAccount.iml" filepath="$PROJECT_DIR$/moreFlexDemo/BankAccount/BankAccount.iml" />
       <module fileurl="file://$PROJECT_DIR$/FlexDemo/FlexDemo.iml" filepath="$PROJECT_DIR$/FlexDemo/FlexDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moreFlexDemo/asynchronousDataDemo/asynchronousDataDemo.iml" filepath="$PROJECT_DIR$/moreFlexDemo/asynchronousDataDemo/asynchronousDataDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/moreFlexDemo/conditionMutexDemo/conditionMutexDemo.iml" filepath="$PROJECT_DIR$/moreFlexDemo/conditionMutexDemo/conditionMutexDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/moreFlexDemo/downloadFileThread-Demo/downloadFileThread-Demo.iml" filepath="$PROJECT_DIR$/moreFlexDemo/downloadFileThread-Demo/downloadFileThread-Demo.iml" />
     </modules>
