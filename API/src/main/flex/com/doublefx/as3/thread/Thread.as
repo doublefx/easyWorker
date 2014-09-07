@@ -115,6 +115,11 @@ public class Thread extends EventDispatcher implements IThread {
     {
         __internalDependencies = Vector.<String>([
             "com.doublefx.as3.thread.api.Runnable",
+            "com.doublefx.as3.thread.api.IWorker",
+            "com.doublefx.as3.thread.api.IProperty",
+            "com.doublefx.as3.thread.api.AsynchronousData",
+            "com.doublefx.as3.thread.api.IDataProducer",
+            "com.doublefx.as3.thread.util.AsynchronousDataManager",
             "com.doublefx.as3.thread.util.Closure",
             "com.doublefx.as3.thread.util.DecodedMessage",
             "com.doublefx.as3.thread.event.ThreadFaultEvent",
@@ -123,6 +128,8 @@ public class Thread extends EventDispatcher implements IThread {
             "com.doublefx.as3.thread.event.ThreadActionRequestEvent",
             "com.doublefx.as3.thread.event.ThreadActionResponseEvent",
             "com.doublefx.as3.thread.error.NotImplementedRunnableError",
+            "com.doublefx.as3.thread.error.IllegalStateError",
+            "com.doublefx.as3.thread.error.UnsupportedOperationError",
             "com.doublefx.as3.thread.util.ClassAlias"]);
     }
 
