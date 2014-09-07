@@ -21,9 +21,9 @@
  * User: Frederic THOMAS Date: 07/09/2014 Time: 17:30
  */
 package com.doublefx.as3.thread.util {
-import com.doublefx.as3.thread.api.AsynchronousData;
 import com.doublefx.as3.thread.api.IDataProducer;
 import com.doublefx.as3.thread.api.IWorker;
+import com.doublefx.as3.thread.api.SharableData;
 import com.doublefx.as3.thread.error.IllegalStateError;
 
 import flash.concurrent.Condition;
@@ -32,7 +32,8 @@ import flash.concurrent.Mutex;
 /**
  * Allow a Thread to send data to or received data from another Thread when a common condition is met.
  * If you use it from your main Thread (application), you won't want to lock it, the reason why the send() method
- * has lock set to false by default making the data passed asynchronously, set it to true for synchronous data transfer.
+ * has lock set to false by default making the data passed asynchronously, set it to true for synchronous data transfer
+ * locking in the same time the caller Thread.
  */
 [RemoteClass(alias="com.doublefx.as3.thread.util.AsynchronousDataManager")]
 public class AsynchronousDataManager {
@@ -58,7 +59,7 @@ public class AsynchronousDataManager {
             lock = _condition.mutex.tryLock();
 
         if (lock) {
-            const data:AsynchronousData = dataProducer.produceData();
+            const data:SharableData = dataProducer.produceData();
             _worker.setSharedProperty(data.key, data.value);
 
             _condition.notify();

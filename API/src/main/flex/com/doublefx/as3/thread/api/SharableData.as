@@ -23,12 +23,12 @@
 package com.doublefx.as3.thread.api {
 
 [RemoteClass(alias="com.doublefx.as3.thread.api.AsynchronousData")]
-public class AsynchronousData implements IProperty {
+public class SharableData implements IProperty {
 
     private var _key:String;
     private var _value:Object;
 
-    public function AsynchronousData(key:String = null, value:Object = null) {
+    public function SharableData(key:String = null, value:Object = null) {
         _key = key;
         _value = value;
     }
