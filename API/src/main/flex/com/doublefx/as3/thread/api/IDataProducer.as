@@ -22,6 +22,6 @@
  */
 package com.doublefx.as3.thread.api {
 public interface IDataProducer {
-    function produceData():AsynchronousData;
+    function produceData():SharableData;
 }
 }
