@@ -22,7 +22,7 @@
  */
 package com.doublefx.as3.thread.api {
 
-[RemoteClass(alias="com.doublefx.as3.thread.api.AsynchronousData")]
+[RemoteClass(alias="com.doublefx.as3.thread.api.SharableData")]
 public class SharableData implements IProperty {
 
     private var _key:String;

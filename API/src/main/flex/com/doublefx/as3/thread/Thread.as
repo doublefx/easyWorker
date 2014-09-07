@@ -120,7 +120,7 @@ public class Thread extends EventDispatcher implements IThread {
             "com.doublefx.as3.thread.api.Runnable",
             "com.doublefx.as3.thread.api.IWorker",
             "com.doublefx.as3.thread.api.IProperty",
-            "com.doublefx.as3.thread.api.AsynchronousData",
+            "com.doublefx.as3.thread.api.SharableData",
             "com.doublefx.as3.thread.api.IDataProducer",
             "com.doublefx.as3.thread.util.AsynchronousDataManager",
             "com.doublefx.as3.thread.util.Closure",
