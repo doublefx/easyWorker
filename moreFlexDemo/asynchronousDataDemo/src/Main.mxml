@@ -23,9 +23,9 @@
                implements="com.doublefx.as3.thread.api.IDataProducer">
     <fx:Script><![CDATA[
         import com.doublefx.as3.thread.Thread;
-        import com.doublefx.as3.thread.api.AsynchronousData;
         import com.doublefx.as3.thread.api.IDataProducer;
         import com.doublefx.as3.thread.api.IThread;
+        import com.doublefx.as3.thread.api.SharableData;
         import com.doublefx.as3.thread.event.ThreadResultEvent;
         import com.doublefx.as3.thread.util.AsynchronousDataManager;
 
@@ -46,17 +46,27 @@
         }
 
         private function btn_clickHandler(event:MouseEvent):void {
+
+            // If not created from a previous click on the button, we created AsynchronousDataManager
+            // for this Thread and pass it a condition name, under the wood, a Condition/Mutex is
+            // created and used to lock the callee Thread until this Condition is met.
+            // The optional 3th parameter of the send method called "lock" allows you to lock the
+            // current Thread until the callee Thread has done its job, it set to false by default
+            // as most of the time, you won't want to lock it.
             if (!_asynchronousDataManager)
                 _asynchronousDataManager = new AsynchronousDataManager(_thread, "whenDataReady");
 
+            // If the send method returns true, it means the callee Thread is not
+            // busy and AsynchronousDataManager will be able to call and send to it
+            // the data produce by IDataProducer.produceData()
             if (!_asynchronousDataManager.send(this as IDataProducer)) {
-                // The thread is not waiting, so show an error message
+                // If the thread is not waiting, so show an error message
                 // indicating that it's too busy for a new request
                 errorMessage.text = "Error: thread busy at " + getTimer();
             }
         }
 
-        public function produceData():AsynchronousData {
+        public function produceData():SharableData {
 
             // Create a big ByteArray for the thread to compress
             _bytes = new ByteArray();
@@ -75,7 +85,7 @@
             // thread compresses the bytes.
             addEventListener(Event.ENTER_FRAME, onEnterFrame);
 
-            return new AsynchronousData("bytes", _bytes);
+            return new SharableData("bytes", _bytes);
         }
 
         private function onEnterFrame(ev:Event):void {
