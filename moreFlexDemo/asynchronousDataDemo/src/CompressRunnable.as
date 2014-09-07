@@ -35,8 +35,12 @@ public class CompressRunnable implements Runnable {
         const asynchronousDataManager:AsynchronousDataManager = new AsynchronousDataManager(dispatcher, "whenDataReady");
 
         // Endless loop to compress data as long as it has been sent.
-        // In real life, you may want a way to stop it cleanly, to do so, you can add an
-        // event listener to the dispatcher on ThreadActionRequestEvent.TERMINATE_REQUESTED;
+        // When the condition represented by "whenDataReady" is not met (AKA. the data are not ready),
+        // this Thread is locked.
+        // In real life, you may not want to do an endless loop, to do so, you can add an
+        // event listener to the dispatcher on ThreadActionRequestEvent.TERMINATE_REQUESTED
+        // create and check a Boolean here and terminate gracefully or wait for the job
+        // is completely done.
         while (true)
             compress(asynchronousDataManager.receive("bytes") as ByteArray);
     }
