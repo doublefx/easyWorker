@@ -23,6 +23,7 @@
     <fx:Script><![CDATA[
         import com.doublefx.as3.thread.Thread;
         import com.doublefx.as3.thread.api.IThread;
+        import com.doublefx.as3.thread.event.ThreadFaultEvent;
         import com.doublefx.as3.thread.event.ThreadResultEvent;
 
         import flash.concurrent.Condition;
@@ -36,19 +37,19 @@
         private var _bytes:ByteArray;
 
         private function applicationCompleteHandler(event:FlexEvent):void {
-            // Create and start a new Thread as now the loaderInfo filled.
             _thread = new Thread(CompressRunnable, "myCompressRunnable") as IThread;
             _thread.addEventListener(ThreadResultEvent.RESULT, onResult);
+            _thread.addEventListener(ThreadFaultEvent.FAULT, onError);
             _thread.start();
         }
 
         private function btn_clickHandler(event:MouseEvent):void {
-            // Get the condition the thread created for us
+            // Get the condition the thread created for us.
             const condition:Condition = _thread.getSharedProperty("condition");
 
             // Try to take ownership of the condition mutex
             // During this phase, the Thread is waiting
-            // for data and in a loop, and therefore not available.
+            // for data and is in a loop, and therefore not available.
             if (condition.mutex.tryLock()) {
                 // Create a big ByteArray for the thread to compress
                 _bytes = new ByteArray();
@@ -62,7 +63,7 @@
 
                 // The thread is waiting, so we got the lock. Notify the thread
                 // that the bytes are ready and release our ownership of the
-                // mutex since we only needed it to notify.
+                // mutex.
                 condition.notify();
                 condition.mutex.unlock();
 
@@ -93,6 +94,17 @@
             logger.text = "Done compressing " + SIZE + " bytes to "
             + _bytes.length + " bytes ("
             + ((_bytes.length * 100.0) / SIZE).toFixed(2) + "%)";
+        }
+
+        private function onError(event:ThreadFaultEvent):void {
+            // There is a bug in AIR 16 to the last version at the time I'm writing: 18.0.0.161
+            // "Error #3735: This API cannot accept shared ByteArrays."
+            // see https://bugbase.adobe.com/index.cfm?event=bug&id=3938269.
+            removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+
+            // Output some statistics about the work that was done
+            logger.text = "AIR: " + Capabilities.version + " - " +  event.fault.message;
+            _thread.terminate();
         }
         ]]></fx:Script>
 
