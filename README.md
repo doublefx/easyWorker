@@ -9,7 +9,7 @@ everything is in-memory, don't deal anymore with MessageChannel and other low le
 Includes all the used classes and nothing more (except if you want to),
 register for you your typed object to pass them back and forth the Worker.
 
-[Download easyWorkerAS3.swc] [8] (Click on "View Raw"), the PureAS3 version can be found [here] [9]
+[Download easyWorkerAS3.swc] [8] (Click on "View Raw"), the Flex / AIR version version can be found [here] [9]
 
 How to use it ?
 ----
