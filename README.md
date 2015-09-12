@@ -9,8 +9,7 @@ everything is in-memory, don't deal anymore with MessageChannel and other low le
 Includes all the used classes and nothing more (except if you want to),
 register for you your typed object to pass them back and forth the Worker.
 
-[Download easyWorkerAS3.swc] [8] (Deselect "Download with Sharebeast downloader" and click on the green Download button)
-The Flex / AIR version can be found [here] [9]
+[Download easyWorkerAS3.swc] [8] (Click on "View Raw"), the PureAS3 version can be found [here] [9]
 
 How to use it ?
 ----
@@ -31,7 +30,7 @@ and you may need to set the Thread.DEFAULT_LOADER_INFO as described in the ASDoc
 The [Issues] [1] is a good place to ask things and raise issues indeed.
 
 [1]:https://github.com/doublefx/easyWorker/issues
-[8]:http://www.sharebeast.com/940onmjnfsws
+[8]:https://github.com/doublefx/easyWorker/blob/PureAS3/debug/easyWorkerAS3.swc
 [9]:https://github.com/doublefx/easyWorker
 
 Enjoy and don't hesitate to give me your feedback.
