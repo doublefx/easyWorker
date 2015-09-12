@@ -59,7 +59,7 @@
 
         private function thread_resultHandler(event:ThreadResultEvent):void {
             result.text += event.result;
-            //_thread.terminate();
+            _thread.terminate();
         }
 
         private function thread_faultHandler(event:ThreadFaultEvent):void {
