@@ -9,7 +9,7 @@
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="Apache Flex 4.13.0 FP 15 AIR 15 en_US" />
+          <sdk name="4.14.1_air18_fp18" />
         </dependencies>
         <compiler-options />
         <packaging-air-desktop custom-descriptor-path="$MODULE_DIR$/Main-app.xml" package-file-name="conditionMutexDemo" />
@@ -24,9 +24,8 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Apache Flex 4.13.0 FP 15 AIR 15 en_US" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="4.14.1_air18_fp18" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="API" exported="" />
   </component>
 </module>
-
