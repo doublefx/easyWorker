@@ -3,7 +3,7 @@
   <component name="FlexBuildConfigurationManager" active="easyWorkerAS3">
     <configurations>
       <configuration name="easyWorkerAS3" pure-as="true" output-type="Library" output-file="easyWorkerAS3.swc" output-folder="$MODULE_DIR$/../out/production/API">
-        <dependencies target-player="14.0">
+        <dependencies target-player="18.0">
           <entries>
             <entry library-name="flexunit-4.1.0-flex4" library-level="project">
               <dependency linkage="Test" />
@@ -12,7 +12,7 @@
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="Apache Flex 4.13.0 FP 14 AIR 14 en_US" />
+          <sdk name="4.14.1_air18_fp18" />
         </dependencies>
         <compiler-options>
           <map>
@@ -33,10 +33,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/flex" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resource" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="Apache Flex 4.13.0 FP 14 AIR 14 en_US" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="4.14.1_air18_fp18" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="flexunit-4.1.0-flex4" level="project" />
     <orderEntry type="library" exported="" name="as3commons-reflect" level="project" />
   </component>
 </module>
-
