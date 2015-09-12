@@ -11,7 +11,9 @@
           </entries>
           <sdk name="4.14.1_air18_fp18" />
         </dependencies>
-        <compiler-options />
+        <compiler-options>
+          <option name="additionalOptions" value="-optimize=false" />
+        </compiler-options>
         <packaging-air-desktop custom-descriptor-path="$MODULE_DIR$/Main-app.xml" package-file-name="conditionMutexDemo" />
         <packaging-android />
         <packaging-ios />
