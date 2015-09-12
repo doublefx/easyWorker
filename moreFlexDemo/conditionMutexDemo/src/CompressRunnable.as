@@ -46,13 +46,12 @@ public class CompressRunnable implements Runnable {
         // gives us
         while (true)
         {
-            // Lock the condition mutex so the worker thread can wait on
-            // the condition. This pauses the worker thread until the mutex
-            // can be locked.
+            // Pauses execution of the current thread until this mutex
+            // is available and then takes ownership of the mutex.
             _condition.mutex.lock();
 
             // Wait for the bytes to be ready for compression. This releases
-            // the condition's mutex and pauses the worker thread until the
+            // the condition's mutex and pauses this thread until the
             // main worker thread calls notify() on the condition.
             _condition.wait();
 
