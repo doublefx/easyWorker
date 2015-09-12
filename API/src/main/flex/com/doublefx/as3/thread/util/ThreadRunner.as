@@ -156,7 +156,7 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
             trace("ThreadRunner run");
             func.apply(null, args);
         } catch (e:Error) {
-            trace("got an Error in Run()" + e.message, e.getStackTrace());
+            dispatchError(e);
         }
     }
 
