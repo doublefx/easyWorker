@@ -40,6 +40,8 @@ public class ComplexWorker implements Runnable {
 
     // Implements Runnable interface
     public function run(args:Array):void {
+        pkgLevelFunctionTest();
+        topLevelFunctionTest();
         const values:TermsVo = args[0] as TermsVo;
         _dispatcher.dispatchResult(add(values));
     }

@@ -41,7 +41,8 @@
         private var _thread:IThread;
 
         private function applicationCompleteHandler(event:FlexEvent):void {
-            _thread = new Thread(ComplexWorker, "complexRunnable");
+            const extraDependencies:Vector.<String> = Vector.<String>(["workers.*", "topLevelFunctionTest()"]);
+            _thread = new Thread(ComplexWorker, "complexRunnable", false, extraDependencies);
 
             _thread.addEventListener(ThreadStateEvent.THREAD_STATE, onThreadState);
             _thread.addEventListener(ThreadProgressEvent.PROGRESS, thread_progressHandler);

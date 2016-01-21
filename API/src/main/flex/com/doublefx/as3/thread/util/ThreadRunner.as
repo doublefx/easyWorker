@@ -139,7 +139,7 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
         if (!_callLater)
             _callLater = [];
 
-        _callLater[_callLater.length] = fct;
+        _callLater.push(fct);
     }
 
     protected function run(...args):void {

@@ -234,7 +234,7 @@ public class ThreadDependencyHelper {
 
     public static function addUniquely(item:String, array:Vector.<String>):Boolean {
         if (item != null && array.indexOf(item) == -1) {
-            array[array.length] = item;
+            array.push(item);
             return true;
         }
         return false;
