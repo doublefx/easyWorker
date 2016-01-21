@@ -64,6 +64,7 @@ import org.as3commons.reflect.Type;
  * Create and Manage a Worker for a given Runnable.
  */
 public class Thread extends EventDispatcher implements IThread {
+    private static const THREAD_NS:String = "com.doublefx.as3.thread.";
 
     /**
      * The Default LoaderInfo used by all new created Thread when none is provided to its constructor.
@@ -114,46 +115,47 @@ public class Thread extends EventDispatcher implements IThread {
 
     {
         __internalDependencies = Vector.<String>([
-            "com.doublefx.as3.thread.api.Runnable",
-            "com.doublefx.as3.thread.api.IWorker",
-            "com.doublefx.as3.thread.api.IProperty",
-            "com.doublefx.as3.thread.api.SharableData",
-            "com.doublefx.as3.thread.api.IDataProducer",
-            "com.doublefx.as3.thread.util.AsynchronousDataManager",
-            "com.doublefx.as3.thread.util.Closure",
-            "com.doublefx.as3.thread.util.DecodedMessage",
-            "com.doublefx.as3.thread.event.ThreadFaultEvent",
-            "com.doublefx.as3.thread.event.ThreadResultEvent",
-            "com.doublefx.as3.thread.event.ThreadProgressEvent",
-            "com.doublefx.as3.thread.event.ThreadActionRequestEvent",
-            "com.doublefx.as3.thread.event.ThreadActionResponseEvent",
-            "com.doublefx.as3.thread.error.NotImplementedRunnableError",
-            "com.doublefx.as3.thread.error.IllegalStateError",
-            "com.doublefx.as3.thread.error.UnsupportedOperationError",
-            "com.doublefx.as3.thread.util.ClassAlias"]);
+            THREAD_NS + "api.Runnable",
+            THREAD_NS + "api.IWorker",
+            THREAD_NS + "api.IProperty",
+            THREAD_NS + "api.SharableData",
+            THREAD_NS + "api.IDataProducer",
+            THREAD_NS + "util.AsynchronousDataManager",
+            THREAD_NS + "util.Closure",
+            THREAD_NS + "util.DecodedMessage",
+            THREAD_NS + "event.ThreadFaultEvent",
+            THREAD_NS + "event.ThreadResultEvent",
+            THREAD_NS + "event.ThreadProgressEvent",
+            THREAD_NS + "event.ThreadActionRequestEvent",
+            THREAD_NS + "event.ThreadActionResponseEvent",
+            THREAD_NS + "error.NotImplementedRunnableError",
+            THREAD_NS + "error.IllegalStateError",
+            THREAD_NS + "error.UnsupportedOperationError",
+            THREAD_NS + "util.ClassAlias"]);
     }
 
     {
         __internalAliasesToRegister = new Vector.<ClassAlias>();
 
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("Class");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("RegExp");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("Error");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("ArgumentError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("DefinitionError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("EvalError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("RangeError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("ReferenceError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("SecurityError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("SyntaxError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("TypeError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("URIError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("VerifyError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("UninitializedError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.IOError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.EOFError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.MemoryError");
-        __internalAliasesToRegister[__internalAliasesToRegister.length] = new ClassAlias("flash.errors.IllegalOperationError");
+        __internalAliasesToRegister.push(
+                new ClassAlias("Class"),
+                new ClassAlias("RegExp"),
+                new ClassAlias("Error"),
+                new ClassAlias("ArgumentError"),
+                new ClassAlias("DefinitionError"),
+                new ClassAlias("EvalError"),
+                new ClassAlias("RangeError"),
+                new ClassAlias("ReferenceError"),
+                new ClassAlias("SecurityError"),
+                new ClassAlias("SyntaxError"),
+                new ClassAlias("TypeError"),
+                new ClassAlias("URIError"),
+                new ClassAlias("VerifyError"),
+                new ClassAlias("UninitializedError"),
+                new ClassAlias("flash.errors.IOError"),
+                new ClassAlias("flash.errors.EOFError"),
+                new ClassAlias("flash.errors.MemoryError"),
+                new ClassAlias("flash.errors.IllegalOperationError"));
     }
 
     /**
@@ -177,7 +179,7 @@ public class Thread extends EventDispatcher implements IThread {
             if (runnable) {
 
                 _sharedProperties = new Dictionary();
-                registerClassAlias("com.doublefx.as3.thread.util.ClassAlias", ClassAlias);
+                registerClassAlias(THREAD_NS + "util.ClassAlias", ClassAlias);
                 registerClassAlias("flash.net.SharedObject", SharedObject);
 
                 loaderInfo ||= DEFAULT_LOADER_INFO;
@@ -185,15 +187,22 @@ public class Thread extends EventDispatcher implements IThread {
 
                 if (loaderInfo) {
 
-                    if (extraDependencies)
+                    if (extraDependencies) {
+                        for (var i:int = 0; i < extraDependencies.length; i++) {
+                            const dependency:String = extraDependencies[i];
+                            if (StringUtils.endsWith(dependency, "()")) {
+                                extraDependencies[i] = dependency.substr(0, dependency.length - 2);
+                            }
+                        }
                         extraDependencies = extractClassesFromPackages(loaderInfo.applicationDomain, extraDependencies);
+                    }
 
                     reflect(loaderInfo.applicationDomain, extraDependencies);
 
                     _worker = WorkerFactory.getWorkerFromClass(loaderInfo, ThreadRunner, _collectedDependencies, Capabilities.isDebugger, giveAppPrivileges, workerDomain);
                     _worker.addEventListener(Event.WORKER_STATE, onWorkerState);
-                    _worker.setSharedProperty("com.doublefx.as3.thread.name", _name);
-                    _worker.setSharedProperty("com.doublefx.as3.thread.id", _id);
+                    _worker.setSharedProperty(THREAD_NS + "name", _name);
+                    _worker.setSharedProperty(THREAD_NS + "id", _id);
 
                     _incomingChannel = _worker.createMessageChannel(Worker.current);
                     _outgoingChannel = Worker.current.createMessageChannel(_worker);
@@ -229,7 +238,7 @@ public class Thread extends EventDispatcher implements IThread {
             if (StringUtils.isEmpty(classAlias.alias))
                 classAlias.alias = ClassUtils.convertFullyQualifiedName(classAlias.fullyQualifiedName);
 
-            aliasesToRegister[aliasesToRegister.length] = [classAlias.fullyQualifiedName, classAlias.alias];
+            aliasesToRegister.push([classAlias.fullyQualifiedName, classAlias.alias]);
 
             var cls:Class = getDefinitionByName(classAlias.fullyQualifiedName) as Class;
             registerClassAlias(classAlias.alias, cls);
@@ -248,7 +257,7 @@ public class Thread extends EventDispatcher implements IThread {
     }
 
     private static function extractClassesFromPackages(applicationDomain:ApplicationDomain, extraDependencies:Vector.<String>):Vector.<String> {
-        const more:Array = [];
+        const moreDefinitions:Array = [];
         for (var i:uint = 0; i < extraDependencies.length; i++) {
             const alias:String = extraDependencies[i];
             if (StringUtils.endsWith(alias, ".*")) {
@@ -258,22 +267,22 @@ public class Thread extends EventDispatcher implements IThread {
                 const definitionNames:Vector.<String> = applicationDomain.getQualifiedDefinitionNames();
                 for each (var definitionName:String in definitionNames) {
                     if (StringUtils.startsWith(definitionName, packageBase) || StringUtils.startsWith(definitionName, packageBaseEx)) {
-                        more[more.length] = definitionName;
+                        moreDefinitions.push(definitionName);
                     }
                 }
             }
         }
 
-        if (more.length > 0)
-            for each (var definition:String in more) {
-                extraDependencies[extraDependencies.length] = definition;
+        if (moreDefinitions.length > 0)
+            for each (var definition:String in moreDefinitions) {
+                extraDependencies.push(definition);
             }
 
         return extraDependencies;
     }
 
     private function reflect(domain:ApplicationDomain, extraDependencies:Vector.<String>):void {
-        var className:String;
+        var qualifiedDefinitionName:String;
 
         const threadRunnerClassName:String = ClassUtils.getFullyQualifiedName(ThreadRunner, true);
         const threadRunnerType:Type = Type.forName(threadRunnerClassName, domain);
@@ -283,10 +292,10 @@ public class Thread extends EventDispatcher implements IThread {
         const runnableDependencies:Vector.<String> = ThreadDependencyHelper.collectDependencies(runnableType);
 
         if (runnableDependencies.length > 0)
-            for each (className in runnableDependencies) {
-                className = ClassUtils.convertFullyQualifiedName(className);
-                if (className.indexOf("com.doublefx.as3.thread.") != 0) {
-                    ThreadDependencyHelper.addUniquely(className, _collectedDependencies);
+            for each (qualifiedDefinitionName in runnableDependencies) {
+                qualifiedDefinitionName = ClassUtils.convertFullyQualifiedName(qualifiedDefinitionName);
+                if (qualifiedDefinitionName.indexOf(THREAD_NS) != 0) {
+                    ThreadDependencyHelper.addUniquely(qualifiedDefinitionName, _collectedDependencies);
                 }
             }
 
@@ -294,25 +303,28 @@ public class Thread extends EventDispatcher implements IThread {
             _collectedDependencies.shift();
 
         if (__internalDependencies && __internalDependencies.length > 0)
-            for each (className in __internalDependencies) {
-                ThreadDependencyHelper.addUniquely(className, _collectedDependencies);
+            for each (qualifiedDefinitionName in __internalDependencies) {
+                ThreadDependencyHelper.addUniquely(qualifiedDefinitionName, _collectedDependencies);
             }
 
         if (extraDependencies && extraDependencies.length > 0)
-            for each (className in extraDependencies) {
-                if (className) {
+            for each (qualifiedDefinitionName in extraDependencies) {
+                if (qualifiedDefinitionName) {
                     try {
-                        const classType:Type = Type.forName(className, domain);
+                        const classType:Type = Type.forName(qualifiedDefinitionName, domain);
+                        if (!classType.clazz && classType.name == "null") {
+                            addUniquely(qualifiedDefinitionName);
+                        } else {
                         const collectExtraDependencies:Vector.<String> = ThreadDependencyHelper.collectDependencies(classType);
                         for each (var dependencyName:String in collectExtraDependencies) {
                             dependencyName = ClassUtils.convertFullyQualifiedName(dependencyName);
-                            if (dependencyName.indexOf("com.doublefx.as3.thread.") != 0) {
+                                if (dependencyName.indexOf(THREAD_NS) != 0) {
                                 ThreadDependencyHelper.addUniquely(dependencyName, _collectedDependencies);
                             }
                         }
+                        }
                     } catch (e:Error) {
-                        var qualifiedName:String = ClassUtils.convertFullyQualifiedName(className);
-                        ThreadDependencyHelper.addUniquely(qualifiedName, _collectedDependencies);
+                        addUniquely(qualifiedDefinitionName);
                     }
                 }
             }
@@ -320,17 +332,22 @@ public class Thread extends EventDispatcher implements IThread {
         if (!_collectedAliasesToRegister)
             _collectedAliasesToRegister = new Vector.<ClassAlias>();
 
-        for each (className in _collectedDependencies) {
+        for each (qualifiedDefinitionName in _collectedDependencies) {
             try {
-                const dependency:Type = Type.forName(className, domain);
+                const dependency:Type = Type.forName(qualifiedDefinitionName, domain);
                 if (dependency) {
                     const classAlias:ClassAlias = ThreadDependencyHelper.collectAliases(dependency);
                     if (classAlias)
-                        _collectedAliasesToRegister[_collectedAliasesToRegister.length] = classAlias;
+                        _collectedAliasesToRegister.push(classAlias);
                 }
             } catch (e:Error) {
             }
         }
+    }
+
+    private function addUniquely(qualifiedDefinitionName:String):void {
+        const qualifiedName:String = ClassUtils.convertFullyQualifiedName(qualifiedDefinitionName);
+        ThreadDependencyHelper.addUniquely(qualifiedName, _collectedDependencies);
     }
 
     ////////////////////////////

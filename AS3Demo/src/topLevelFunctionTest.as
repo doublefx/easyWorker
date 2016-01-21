@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Frédéric Thomas
+ * Copyright (c) 2016 Frédéric Thomas
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -17,12 +17,6 @@
  * limitations under the License.
  */
 
-/**
- * User: Frederic THOMAS Date: 13/06/2014 Time: 17:21
- */
-package com.doublefx.as3.thread.api {
-
-public interface Runnable{
-    function run(args:Array):void;
-}
+package {
+public function topLevelFunctionTest():Object {return null;}
 }

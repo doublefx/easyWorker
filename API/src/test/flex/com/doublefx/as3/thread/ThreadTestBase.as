@@ -22,19 +22,10 @@
  */
 package com.doublefx.as3.thread {
 import com.doublefx.as3.test.matcher.ArrayExactMatcher;
-import com.doublefx.as3.thread.Thread;
-import com.doublefx.as3.thread.Thread;
 import com.doublefx.as3.thread.api.IThread;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;
 
 import flash.display.LoaderInfo;
-
-import flash.display.LoaderInfo;
-import flash.system.ApplicationDomain;
-
-import flash.system.WorkerState;
-
-import mx.core.FlexGlobals;
 
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
@@ -42,7 +33,6 @@ import org.flexunit.asserts.assertNotNull;
 import org.flexunit.asserts.assertNull;
 import org.flexunit.asserts.assertTrue;
 import org.hamcrest.Matcher;
-import org.hamcrest.assertThat;
 
 use namespace thread_diagnostic;
 
@@ -51,7 +41,7 @@ public class ThreadTestBase {
     public static var loaderInfo:LoaderInfo;
 
     public function ThreadTestBase() {
-        loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
+        //loaderInfo ||= FlexGlobals.topLevelApplication.loaderInfo;
     }
 
     protected var _thread:IThread;

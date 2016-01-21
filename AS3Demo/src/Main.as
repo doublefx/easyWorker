@@ -127,7 +127,8 @@ public class Main extends Sprite {
 
     private function childrenCreated(event:Event):void {
         try {
-            _thread = new Thread(ComplexWorker, "complexRunnable");
+            const extraDependencies:Vector.<String> = Vector.<String>(["workers.*", "topLevelFunctionTest()"]);
+            _thread = new Thread(ComplexWorker, "complexRunnable", false, extraDependencies);
 
             _thread.addEventListener(ThreadStateEvent.THREAD_STATE, onThreadState);
             _thread.addEventListener(ThreadProgressEvent.PROGRESS, thread_progressHandler);

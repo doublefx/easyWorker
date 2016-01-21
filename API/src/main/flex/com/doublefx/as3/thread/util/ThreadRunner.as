@@ -139,7 +139,7 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
         if (!_callLater)
             _callLater = [];
 
-        _callLater[_callLater.length] = fct;
+        _callLater.push(fct);
     }
 
     protected function run(...args):void {
@@ -156,7 +156,7 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
             trace("ThreadRunner run");
             func.apply(null, args);
         } catch (e:Error) {
-            trace("got an Error in Run()" + e.message, e.getStackTrace());
+            dispatchError(e);
         }
     }
 
@@ -275,10 +275,12 @@ public class ThreadRunner extends DebuggableWorker implements CrossThreadDispatc
     }
 
     public function dispatchError(error:Error):void {
+        trace("ThreadRunner dispatchError: " + error.message);
         _outgoingChannel.send(new ThreadFaultEvent(error));
     }
 
     public function dispatchResult(result:*):void {
+        //trace("ThreadRunner dispatchResult: " + result);
         _outgoingChannel.send(new ThreadResultEvent(result));
     }
 

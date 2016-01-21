@@ -30,9 +30,7 @@ import flash.system.WorkerState;
 
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
-import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertNotNull;
-import org.flexunit.asserts.assertTrue;
 import org.flexunit.asserts.fail;
 import org.flexunit.async.Async;
 

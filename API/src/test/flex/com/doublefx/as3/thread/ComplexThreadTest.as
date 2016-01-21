@@ -24,7 +24,6 @@ package com.doublefx.as3.thread {
 import com.doublefx.as3.thread.event.ThreadFaultEvent;
 import com.doublefx.as3.thread.event.ThreadResultEvent;
 import com.doublefx.as3.thread.namespace.thread_diagnostic;
-import com.doublefx.as3.thread.util.ClassAlias;
 import workers.*;
 import workers.vo.TermsVo;
 
