@@ -8,11 +8,11 @@
             <entry library-name="flexunit-4.1.0-flex4" library-level="project">
               <dependency linkage="Test" />
             </entry>
-            <entry library-name="as3commons-reflect" library-level="project">
-              <dependency linkage="Merged" />
-            </entry>
             <entry library-id="ec62c943-50c5-4004-9f73-69f6e1770a98">
               <dependency linkage="Test" />
+            </entry>
+            <entry library-name="as3commons" library-level="project">
+              <dependency linkage="Merged" />
             </entry>
           </entries>
           <sdk name="4.14.1_air18_fp18" />
@@ -50,5 +50,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" exported="" name="as3commons" level="project" />
   </component>
 </module>
